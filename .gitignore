@@ -1,0 +1,27 @@
+# FPC build artifacts
+obj/
+*.o
+*.ppu
+*.a
+*.or
+link*.res
+PPas*.bat
+PPas*.sh
+
+# Compiled binary
+pravkal6
+pravkal6.exe
+
+# Data files copied to project root by build.sh (canonical copies are in data/)
+/_PRAZ1.KAL
+/_PRAZ#2.KAL
+/_PRAZ2.KAL
+/_PRAZ3.KAL
+/_PRAZ4.KAL
+/_PRAZ5.KAL
+/_PRAZ6.KAL
+/_GRESKE.MOL
+
+# OS noise
+.DS_Store
+Thumbs.db

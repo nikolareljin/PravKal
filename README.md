@@ -1,0 +1,183 @@
+# Pravoslavni Kalendar — FPC Port
+
+TUI calendar for the Serbian Orthodox Church, ported from the original DOS
+Turbo Pascal 6/7 program to Free Pascal (FPC) for Linux, Windows, and macOS.
+
+**Original authors:** Nikola Reljin, Ivona Maric, Nikola Lecic  
+**Original source:** Turbo Pascal 6/7, DOS, ~1260 lines  
+**This port:** Free Pascal 3.x, cross-platform TUI (`crt` unit)
+
+---
+
+## Features
+
+- Parallel Gregorian / Julian date columns (SOC uses Julian calendar)
+- 532-year Alexandrian Paschalion computed at runtime via Meeus algorithm
+- Movable feast names derived from Easter (Pascha), fixed feasts from data tables
+- Fasting-day markers on each calendar row
+- Byzantine year and liturgical Indiction display
+- Month/year navigation, print-to-stdout, heortology viewer
+- Pure TUI — runs in any 80×25 terminal (xterm, gnome-terminal, Windows Terminal)
+
+---
+
+## Requirements
+
+| Tool | Version |
+|------|---------|
+| Free Pascal Compiler | 3.2.x or later |
+| Terminal | 80 columns × 25 rows minimum |
+
+Install FPC on Ubuntu/Debian:
+```
+sudo apt install fpc
+```
+
+---
+
+## Build
+
+```bash
+bash build.sh
+```
+
+This compiles `src/pravkal6.pas` into `./pravkal6` and copies the runtime
+`.KAL` / `.MOL` data files from `data/` to the project root (where the binary
+expects them).
+
+The `obj/` directory holds intermediate FPC unit files and is created
+automatically on first build.
+
+---
+
+## Run
+
+```bash
+cd /path/to/KalendarFPC
+./pravkal6
+```
+
+The program must be launched from the directory that contains the binary
+(so that data-file lookups via `ExtractFilePath(ParamStr(0))` resolve correctly).
+
+---
+
+## Keyboard Reference
+
+| Key | Action |
+|-----|--------|
+| ↑ / ↓ | Scroll weeks within current month |
+| F3 | Change month / year dialog |
+| F5 | Heortology viewer (feast-day texts from .KAL files) |
+| F7 | Print current month to stdout |
+| F10 | Drop-down menu |
+| Ctrl-C | Exit |
+
+Inside the **F3 date dialog:**
+
+| Key | Action |
+|-----|--------|
+| PgUp / PgDn | Next / previous month |
+| + / − | Increment / decrement year |
+| Enter | Confirm |
+| Esc | Cancel |
+
+---
+
+## Data Files
+
+All runtime data lives in `data/` (committed) and is copied to the project
+root by `build.sh` at build time.
+
+| File | Content |
+|------|---------|
+| `_PRAZ1.KAL` | Heortology text: Blagovesti (Annunciation) |
+| `_PRAZ2.KAL` | Heortology text: Krstovdan (Elevation of the Cross) |
+| `_PRAZ3.KAL` | Heortology text: Nativity of the Theotokos |
+| `_PRAZ4.KAL` | Heortology text: Presentation of the Theotokos |
+| `_PRAZ5.KAL` | Heortology text: Bozic (Christmas / Nativity of Christ) |
+| `_PRAZ6.KAL` | Heortology text: Bozic (alternate text) |
+| `_GRESKE.MOL` | Exit-screen text (prayer / closing message) |
+| `_KRST.GEI` | Original DOS cross graphic (not used in FPC port) |
+
+---
+
+## Project Structure
+
+```
+KalendarFPC/
+├── build.sh            # Build + data-copy script
+├── data/               # Canonical runtime data files
+├── obj/                # FPC intermediate files (generated, gitignored)
+├── src/
+│   ├── pravkal6.pas    # Main program
+│   ├── kalsys1.pas     # Calendar engine (Paschalion, leap year, colours)
+│   ├── kalmenu1.pas    # Menu bar, drop-downs, function-key strip
+│   ├── kalwork1.pas    # Screen I/O, dialogs, key handling
+│   └── nizz.pas        # String utilities, shared types
+└── README.md
+```
+
+---
+
+## What Works
+
+- [x] Calendar display: month view, D/G/J columns, fasting markers
+- [x] Paschalion: 532-year cycle computed at runtime, correct for any year
+- [x] Julian date conversion: 13-day offset, century-year adjustments
+- [x] Navigation: ↑/↓ scroll within month, F3 change date
+- [x] Movable feasts: Pascha, Holy Week, Pentecost, all derived feasts
+- [x] Heortology viewer: F5 opens .KAL texts
+- [x] Print to stdout: F7
+- [x] About dialog: F10 → Desk → Program...
+- [x] Fasting table: F10 → Opcije → Postovi
+- [x] Indiction table: F10 → Opcije → Indiktion
+- [x] Exit: Ctrl-C
+
+## Known Issues / Not Implemented
+
+- [ ] **Search (Traganje menu)**: all four search items (date, feast, fast, Sunday) are wired in the menu but have no implementation — stubs only
+- [ ] **Print to printer**: F7 writes to stdout; actual printer/file output not implemented
+- [ ] **Print fasting table (F8)**: no implementation
+- [ ] **Configuration (Konfiguracija)**: menu item present, no implementation
+- [ ] **Save configuration**: menu item present, no implementation
+- [ ] **Help (F1)**: shows in strip, no dialog implemented
+- [ ] **Contents (Alt-F1)**: no implementation
+- [ ] **Scrolling animation within month**: `premwindsve` is a no-op stub; month view redraws fully on scroll (no smooth line-by-line scroll as in original DOS version)
+- [ ] **Box-drawing characters**: uses ASCII art (`+`, `-`, `|`) instead of Unicode box-drawing (╔, ║, ═, …); upgrade planned for Lazarus GUI port
+
+---
+
+## Calendar Notes
+
+The SOC uses the **Julian calendar** for all liturgical dates. The program
+displays both Gregorian (column G) and Julian (column J) dates side by side.
+In 2026 the offset is **13 days** (Julian is 13 days behind Gregorian).
+
+**Paschalion anchor:** year 1941 (start of the current 532-year Great Indiction
+cycle). Julian Easter 1941 = April 7 Julian = April 20 Gregorian. ✓
+
+**Byzantine year** (shown in info panel): approximately Gregorian year + 5508,
+adjusted September for the ecclesiastical New Year.
+
+---
+
+## Future Plans
+
+- **Lazarus GUI port**: reuse `kalsys1.pas` calendar engine; wrap in
+  LCL (Lazarus Component Library) for native GUI on Linux, Windows, macOS
+- **Larger screen support**: parameterise `SCREEN_W` / `SCREEN_H`, remove
+  80×25 hardcoding
+- **Unicode box drawing**: upgrade ASCII art to UTF-8 box chars
+- **Hagiography**: integrate Serbian Prologue (Prolog iz Ohrida) content
+  for feast-day texts in `.KAL` files
+- **Extended date range**: current algorithm handles 0 AD – 4000 AD correctly
+  via Meeus Julian Easter formula; UI date entry validation to be extended
+- **Search implementation**: Traganje menu — find by date, feast, fast, Sunday
+
+---
+
+## Original Source
+
+The original DOS program (`PRAVKAL6.PAS`) is preserved in the sibling
+`Kalendar/` directory and must not be modified.
