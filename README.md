@@ -9,6 +9,37 @@ Turbo Pascal 6/7 program to Free Pascal (FPC) for Linux, Windows, and macOS.
 
 ---
 
+## Screenshots
+
+**Main calendar view** — parallel Gregorian (G) and Julian (J) columns, feast-day
+colours (yellow = major, cyan = Sunday/movable), fasting markers `*`, Byzantine
+year and Indiction in the right panel.
+
+![Main calendar view — June 2026](docs/screenshots/01_main.png)
+
+**Month scroll** — ↑/↓ arrows scroll the week window within the month.
+
+![Scrolled view showing weeks 2–3](docs/screenshots/02_scrolled.png)
+
+**Date navigation (F3)** — change month with PgUp/PgDn, year with +/−.
+
+![F3 date change dialog](docs/screenshots/03_date_dialog.png)
+
+**Heortology viewer (F5)** — lists available feast-day texts from `.KAL` files.
+
+![F5 heortology list](docs/screenshots/04_heortology.png)
+
+**Drop-down menu (F10)** — Opcije submenu showing all calendar functions.
+
+![F10 Opcije drop-down menu](docs/screenshots/05_menu.png)
+
+**January view** — Jan 7 = Christmas (Bozic, Julian Dec 25), Jan 6 = Christmas Eve
+(Badnji dan). Fasting markers `*` on days 1–6 (Nativity Fast).
+
+![January 2026 — Christmas and Nativity Fast](docs/screenshots/06_january.png)
+
+---
+
 ## Features
 
 - Parallel Gregorian / Julian date columns (SOC uses Julian calendar)
