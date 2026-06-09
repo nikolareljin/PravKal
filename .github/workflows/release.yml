@@ -1,0 +1,17 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    uses: nikolareljin/ci-helpers/.github/workflows/fpc-release.yml@production
+    with:
+      bin_name: pravkal6
+      build_command: bash build.sh
+      data_glob: "data/_*.KAL data/_*.MOL"
