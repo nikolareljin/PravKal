@@ -31,6 +31,7 @@ procedure elbojwind(x1, y1, x2, y2: integer; col: byte);
 procedure premwindsve(x1, y1, x2, y2, dir: integer);
 function  scankey: char;
 
+procedure waitKey(msg: string);
 procedure about;
 function  setdat(var m, g: integer): boolean;
 procedure tabpost(g: integer);

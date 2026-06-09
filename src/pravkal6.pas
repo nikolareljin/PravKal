@@ -1008,6 +1008,264 @@ begin
   WriteLn(nuv + zatvtab);
 end;
 
+{ ── String input helper ──────────────────────────────────────────── }
+
+function readinput(x, y, maxlen: integer): string;
+var buf: string; k: char;
+begin
+  buf := '';
+  repeat
+    GotoXY(x, y);
+    TextColor(co[15] and $0F);
+    TextBackground((co[15] shr 4) and $07);
+    Write(buf + niz(maxlen - length(buf), ' '));
+    GotoXY(x + length(buf), y);
+    k := ReadKey;
+    if k = #0 then k := ReadKey
+    else case k of
+      #8:  if length(buf) > 0 then Delete(buf, length(buf), 1);
+      #27: begin buf := #27; break; end;
+      #13: break;
+    else
+      if (length(buf) < maxlen) and (k >= ' ') then buf := buf + k;
+    end;
+  until false;
+  NormVideo;
+  readinput := buf;
+end;
+
+{ ── $0301 — Trazenje datuma ─────────────────────────────────────── }
+
+function traziDatum: boolean;
+const X1 = 12; Y1 = 5; X2 = 68; Y2 = 19;
+var nd, nm, ng, jd, jm, jy: integer;
+    feast: prstr; nedname: pathstr; s: string[8]; k: char; ok: boolean;
+begin
+  traziDatum := false;
+  nd := 1; nm := _m; ng := _g;
+  openwind(X1, Y1, X2, Y2, co[27], co[27],
+           ' Trazenje datuma ', 0,
+           false, false, false, false, wsingle, 0, 0, true, false, 0);
+  ok := false;
+  repeat
+    elwritecol(X1+2, Y1+2, 'Dan   (1-31): ', co[4]);
+    GotoXY(X1+16, Y1+2);
+    TextColor(co[15] and $0F); TextBackground((co[15] shr 4) and $07);
+    Str(nd, s); Write(s + '   ');
+    elwritecol(X1+2, Y1+3, 'Mesec (1-12): ', co[4]);
+    GotoXY(X1+16, Y1+3);
+    TextColor(co[15] and $0F); TextBackground((co[15] shr 4) and $07);
+    Str(nm, s); Write(s + '   ');
+    elwritecol(X1+2, Y1+4, 'Godina:       ', co[4]);
+    GotoXY(X1+16, Y1+4);
+    TextColor(co[15] and $0F); TextBackground((co[15] shr 4) and $07);
+    Str(ng, s); Write(s + '     ');
+    NormVideo;
+    if nd > brmdg(nm, ng) then nd := brmdg(nm, ng);
+    setjulijan(nd, nm, ng, jd, jm, jy, true);
+    feast   := imepraz(jd, jm, jy);
+    nedname := imened(jd, jm);
+    elwritecol(X1+2, Y1+6,
+      'Julij: ' + strf(jd) + '.' + strf(jm) + '.' + strf(jy) + '.     ', co[17]);
+    elwritecol(X1+2, Y1+7, niz(52, ' '), co[17]);
+    elwritecol(X1+2, Y1+7, 'Praznik: ' + copy(feast, 2, length(feast)), co[15]);
+    if _post[jm][jd] then
+      elwritecol(X1+2, Y1+8, 'Post: DA              ', co[19])
+    else
+      elwritecol(X1+2, Y1+8, 'Post: -               ', co[17]);
+    elwritecol(X1+2, Y1+9, niz(52, ' '), co[17]);
+    if nedname <> '' then
+      elwritecol(X1+2, Y1+9, nedname, co[16]);
+    elwritecol(X1+2, Y1+11, '</>  = dan,  PgUp/PgDn = mesec,  +/- = god.', co[17]);
+    elwritecol(X1+2, Y1+12, 'Enter = idi na mesec,   Esc = odustani', co[17]);
+    k := ReadKey;
+    if k = #0 then k := ReadKey;
+    case k of
+      '>': if nd < 31 then inc(nd) else nd := 1;
+      '<': if nd > 1  then dec(nd) else nd := 31;
+      pgupkey: if nm < 12 then inc(nm) else begin nm := 1; inc(ng); end;
+      pgdnkey: if nm > 1  then dec(nm) else begin nm := 12; dec(ng); end;
+      '+': inc(ng);
+      '-': if ng > 1 then dec(ng);
+      enterkey: ok := true;
+      esckey:   exit;
+    end;
+  until ok;
+  _m := nm; _g := ng;
+  traziDatum := true;
+end;
+
+{ ── $0302 — Trazenje praznika ───────────────────────────────────── }
+
+procedure traziPraznik;
+const X1 = 5; Y1 = 4; X2 = 75; Y2 = 22; PERPAGE = 12;
+var
+  query             : string;
+  rdates            : array[1..50] of string[10];
+  rnames            : array[1..50] of pathstr;
+  rcount, m, d, i   : integer;
+  pg, pgmax, pgstart : integer;
+  k                  : char;
+  feast              : prstr;
+begin
+  openwind(X1, Y1, X2, Y2, co[27], co[27],
+           ' Trazenje praznika ', 0,
+           false, false, false, false, wsingle, 0, 0, true, false, 0);
+  elwritecol(X1+2, Y1+2, 'Unesi deo naziva praznika:', co[4]);
+  query := readinput(X1+2, Y1+3, 40);
+  if (query = '') or (query[1] = #27) then exit;
+  rcount := 0;
+  for m := 1 to 12 do
+    for d := 1 to brdmj(m, _g) do
+    begin
+      feast := imepraz(d, m, _g);
+      if Pos(UpperCase(query), UpperCase(copy(feast, 2, length(feast)))) > 0 then
+        if rcount < 50 then
+        begin
+          inc(rcount);
+          rdates[rcount] := strf(d) + '.' + strf(m) + '.';
+          rnames[rcount] := copy(feast, 2, length(feast));
+          if length(rnames[rcount]) > 47 then
+            rnames[rcount] := copy(rnames[rcount], 1, 47);
+        end;
+    end;
+  openwind(X1, Y1, X2, Y2, co[27], co[27],
+           ' Rezultati: ' + strf(rcount) + ' ', 0,
+           false, false, false, false, wsingle, 0, 0, true, false, 0);
+  if rcount = 0 then
+  begin
+    elwritecol(X1+2, Y1+2, 'Nije pronadjen nijedan praznik.', co[17]);
+    waitKey(' Pritisnite bilo koji taster... ');
+    exit;
+  end;
+  pg    := 1;
+  pgmax := (rcount + PERPAGE - 1) div PERPAGE;
+  repeat
+    elwritecol(X1+2, Y1+1, 'Datum      Praznik' + niz(50, ' '), co[15]);
+    for i := Y1+2 to Y1+2+PERPAGE do
+      elwritecol(X1+2, i, niz(65, ' '), co[2]);
+    pgstart := (pg - 1) * PERPAGE + 1;
+    for i := pgstart to pgstart + PERPAGE - 1 do
+    begin
+      if i > rcount then break;
+      elwritecol(X1+2, Y1+2 + (i - pgstart),
+        rdates[i] + '  ' + rnames[i], co[17]);
+    end;
+    if pgmax > 1 then
+    begin
+      elwritecol(X1+2, Y1+2+PERPAGE,
+        'Str. ' + strf(pg) + '/' + strf(pgmax) +
+        '   PgUp/PgDn=strana   Esc=zatvori', co[17]);
+      k := ReadKey;
+      if k = #0 then k := ReadKey;
+      case k of
+        pgdnkey: if pg < pgmax then inc(pg);
+        pgupkey: if pg > 1     then dec(pg);
+        esckey:  exit;
+      end;
+    end
+    else
+    begin
+      waitKey(' Pritisnite bilo koji taster... ');
+      exit;
+    end;
+  until false;
+end;
+
+{ ── $0303 — Trazenje posta ──────────────────────────────────────── }
+
+procedure traziPost;
+const X1 = 5; Y1 = 4; X2 = 75; Y2 = 22;
+var nm, d, nrow: integer; k: char; feast: prstr; found: boolean;
+begin
+  nm := _m;
+  repeat
+    openwind(X1, Y1, X2, Y2, co[27], co[27],
+             ' Trazenje posta ', 0,
+             false, false, false, false, wsingle, 0, 0, true, false, 0);
+    elwritecol(X1+2, Y1+2,
+      'Mesec: ' + imm[nm] + niz(40, ' '), co[15]);
+    elwritecol(X1+2, Y1+3, niz(66, '-'), co[27]);
+    nrow  := Y1 + 4;
+    found := false;
+    for d := 1 to brdmj(nm, _g) do
+      if _post[nm][d] then
+      begin
+        feast := imepraz(d, nm, _g);
+        elwritecol(X1+2, nrow,
+          strf(d) + '.  ' + copy(feast, 2, length(feast)) + niz(60, ' '), co[17]);
+        found := true;
+        inc(nrow);
+        if nrow > Y1 + 16 then break;
+      end;
+    if not found then
+      elwritecol(X1+2, Y1+4, 'Nema posnih dana u ovom mesecu.', co[17])
+    else
+      while nrow <= Y1+16 do
+      begin
+        elwritecol(X1+2, nrow, niz(67, ' '), co[2]);
+        inc(nrow);
+      end;
+    elwritecol(X1+2, Y1+17, 'PgUp/PgDn = mesec,  Esc = zatvori', co[17]);
+    k := ReadKey;
+    if k = #0 then k := ReadKey;
+    case k of
+      pgupkey: if nm < 12 then inc(nm) else nm := 1;
+      pgdnkey: if nm > 1  then dec(nm) else nm := 12;
+      esckey:  exit;
+    end;
+  until false;
+end;
+
+{ ── $0304 — Trazenje nedelje ────────────────────────────────────── }
+
+procedure traziNedelju;
+const X1 = 5; Y1 = 4; X2 = 75; Y2 = 22; PERPAGE = 12;
+var total, pg, pgmax, pgstart, i: integer; k: char;
+    nedname: pathstr; s: string[12];
+begin
+  total := brned - 1;
+  if total < 1 then begin waitKey(' Nema podataka. '); exit; end;
+  pg    := 1;
+  pgmax := (total + PERPAGE - 1) div PERPAGE;
+  repeat
+    openwind(X1, Y1, X2, Y2, co[27], co[27],
+             ' Nedelje ' + strf(_g) + ' (' + strf(total) + ') ', 0,
+             false, false, false, false, wsingle, 0, 0, true, false, 0);
+    elwritecol(X1+2, Y1+1, 'Datum (jul.)   Naziv nedelje' + niz(40, ' '), co[15]);
+    for i := Y1+2 to Y1+2+PERPAGE do
+      elwritecol(X1+2, i, niz(65, ' '), co[2]);
+    pgstart := (pg - 1) * PERPAGE + 1;
+    for i := pgstart to pgstart + PERPAGE - 1 do
+    begin
+      if i > total then break;
+      nedname := imened(ned[i][1], ned[i][2]);
+      Str(ned[i][1], s);
+      s := s + '.' + strf(ned[i][2]) + '.';
+      elwritecol(X1+2, Y1+2 + (i - pgstart),
+        s + niz(14 - length(s), ' ') + nedname, co[17]);
+    end;
+    if pgmax > 1 then
+    begin
+      elwritecol(X1+2, Y1+2+PERPAGE,
+        'Str. ' + strf(pg) + '/' + strf(pgmax) +
+        '   PgUp/PgDn=strana   Esc=zatvori', co[17]);
+      k := ReadKey;
+      if k = #0 then k := ReadKey;
+      case k of
+        pgdnkey: if pg < pgmax then inc(pg);
+        pgupkey: if pg > 1     then dec(pg);
+        esckey:  exit;
+      end;
+    end
+    else
+    begin
+      waitKey(' Pritisnite bilo koji taster... ');
+      exit;
+    end;
+  until false;
+end;
+
 procedure menuwork(mewo: word);
 var dali: boolean;
 begin
@@ -1022,6 +1280,13 @@ begin
     $0203: begin helppraz;      drawfirstscreen; drawscreen; needRedraw := true; end;
     $0204: begin tabindikt;     drawfirstscreen; drawscreen; needRedraw := true; end;
     $0205: begin quit := true; again := false; end;
+    $0301: begin
+             if traziDatum then begin quit := true; again := true; end
+             else begin drawfirstscreen; drawscreen; needRedraw := true; end;
+           end;
+    $0302: begin traziPraznik;  drawfirstscreen; drawscreen; needRedraw := true; end;
+    $0303: begin traziPost;     drawfirstscreen; drawscreen; needRedraw := true; end;
+    $0304: begin traziNedelju;  drawfirstscreen; drawscreen; needRedraw := true; end;
     $0401: stampaj;
   end;
   { Restore function-key bar (was: move video buffer row back) }
