@@ -208,7 +208,3 @@ adjusted September for the ecclesiastical New Year.
 
 ---
 
-## Original Source
-
-The original DOS program (`PRAVKAL6.PAS`) is preserved in the sibling
-`Kalendar/` directory and must not be modified.
