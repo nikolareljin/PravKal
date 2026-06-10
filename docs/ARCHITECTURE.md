@@ -37,17 +37,17 @@ Precomputed Julian Easter dates for the 532-year Great Indiction cycle
 starting at `__indiktg = 1941`. Populated at unit initialisation via
 `julianEaster()`. Index `i` = cycle year `__indiktg + i - 1`.
 
-### `praz[1..12][1..31]: array of prstr` (pravkal6)
+### `praz[1..12][1..31]: array of prstr` (pravkal)
 Fixed-feast name strings, one per Julian calendar day. Prefix character
 encodes feast rank: `'c'` = major (red-letter), `'m'` = middle, `'o'` = minor.
 Easter-movable feasts overlay `praz` via `pok_[1..11]` lookup at runtime.
 
-### `_post[1..12][1..31]: array of boolean` (pravkal6)
+### `_post[1..12][1..31]: array of boolean` (pravkal)
 Fasting-day grid computed each year by `setpost`. Set to `true` for every
 Julian calendar day that is a fasting day. Built from fixed fasts and the
 Great Lent / Apostles' Fast windows derived from Easter.
 
-### `tabs[1..63]: array of char` (pravkal6)
+### `tabs[1..63]: array of char` (pravkal)
 63-character layout driver for the calendar grid. Period-10 repeating pattern:
 ```
 a b c 0 1 2 3 4 5 6  (repeated 6×, plus abc)
