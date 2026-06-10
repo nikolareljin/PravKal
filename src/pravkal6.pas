@@ -544,7 +544,6 @@ begin
   dnd     := '+' + niz(3,'-') + '+' + niz(4,'-') + '+' + niz(5,'-') + '+' + niz(45,'-') + '+';
   zatvtab := '+' + niz(3,'-') + '+' + niz(4,'-') + '+' + niz(5,'-') + '+' + niz(45,'-') + '+';
   pktab   := '+' + niz(3,'-') + '+' + niz(4,'-') + '+' + niz(5,'-') + '+' + niz(45,'-') + '+';
-  ucitajKonfig;
   dodvredmoom;
 end;
 
@@ -1405,6 +1404,7 @@ begin
   { Stub: keep seg_scr for any code that reads it; no video buffer access }
   seg_scr := $B800;
   setconstcol;
+  ucitajKonfig;     { load saved theme before any screen painting }
   pocetak;
   initialization_; { see procedure initialization_ above }
   drawfirstscreen;

@@ -474,8 +474,7 @@ begin
         elwritecol(X1+4, Y1+3+i, '  ' + TNAMES[i], co[17]);
     elwritecol(X1+2, Y1+8, 'Strelice = izbor,  Enter = primeni', co[17]);
     elwritecol(X1+2, Y1+9, 'Esc = odustani (vraca prethodnu temu)', co[17]);
-    k := ReadKey;
-    if k = #0 then k := ReadKey;
+    k := scankey;
     case k of
       upkey:   if sel > 1 then dec(sel) else sel := NTHEMES;
       downkey: if sel < NTHEMES then inc(sel) else sel := 1;
