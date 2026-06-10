@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   release:
-    uses: nikolareljin/ci-helpers/.github/workflows/fpc-release.yml@release/0.12.0
+    uses: nikolareljin/ci-helpers/.github/workflows/fpc-release.yml@production
     with:
       bin_name: pravkal
       build_command: bash build.sh
