@@ -62,6 +62,11 @@ var
   pamzr : pointer;
   kkmem : pointer;
 
+  { Optional callback set by the caller before tastmenu.
+    Called instead of eraseDropDown so the full calendar is restored
+    before each new dropdown is drawn. }
+  onNavRedraw : procedure;
+
 procedure showmainmenu;
 procedure showkeyfunc(n: byte);
 function  tastmenu: word;
@@ -181,20 +186,26 @@ begin
     case k of
       rightkey:
         begin
-          eraseDropDown(curMenu);
-          GotoXY(mmpos[curMenu], 1);
-          setAttr(co[4]);
-          Write(' ' + mainm[curMenu] + ' ');
+          if Assigned(onNavRedraw) then onNavRedraw
+          else begin
+            eraseDropDown(curMenu);
+            GotoXY(mmpos[curMenu], 1);
+            setAttr(co[4]);
+            Write(' ' + mainm[curMenu] + ' ');
+          end;
           if curMenu < mmmax then inc(curMenu) else curMenu := 1;
           curItem := 1;
           drawDropDown(curMenu, curItem);
         end;
       leftkey:
         begin
-          eraseDropDown(curMenu);
-          GotoXY(mmpos[curMenu], 1);
-          setAttr(co[4]);
-          Write(' ' + mainm[curMenu] + ' ');
+          if Assigned(onNavRedraw) then onNavRedraw
+          else begin
+            eraseDropDown(curMenu);
+            GotoXY(mmpos[curMenu], 1);
+            setAttr(co[4]);
+            Write(' ' + mainm[curMenu] + ' ');
+          end;
           if curMenu > 1 then dec(curMenu) else curMenu := mmmax;
           curItem := 1;
           drawDropDown(curMenu, curItem);
@@ -219,10 +230,13 @@ begin
         done := true;
       esckey:
         begin
-          eraseDropDown(curMenu);
-          GotoXY(mmpos[curMenu], 1);
-          setAttr(co[4]);
-          Write(' ' + mainm[curMenu] + ' ');
+          if Assigned(onNavRedraw) then onNavRedraw
+          else begin
+            eraseDropDown(curMenu);
+            GotoXY(mmpos[curMenu], 1);
+            setAttr(co[4]);
+            Write(' ' + mainm[curMenu] + ' ');
+          end;
           NormVideo;
           tastmenu := 0;
           exit;
@@ -238,7 +252,8 @@ begin
 end;
 
 begin
-  mmmem := nil;
-  pamzr := nil;
-  kkmem := nil;
+  mmmem      := nil;
+  pamzr      := nil;
+  kkmem      := nil;
+  onNavRedraw := nil;
 end.

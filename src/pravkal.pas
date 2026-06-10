@@ -1296,10 +1296,19 @@ begin
   until false;
 end;
 
+{ Restores the full screen — used as the tastmenu navigation callback. }
+procedure doMenuRedraw;
+begin
+  drawfirstscreen;
+  drawscreen;
+  kalendar;
+end;
+
 procedure menuwork(mewo: word);
 var dali: boolean;
 begin
   case mewo of
+    0:     begin drawfirstscreen; drawscreen; needRedraw := true; end;
     $0101: begin about;         drawfirstscreen; drawscreen; needRedraw := true; end;
     $0201: begin
              dali := setdat(_m, _g);
@@ -1317,8 +1326,8 @@ begin
     $0302: begin traziPraznik;  drawfirstscreen; drawscreen; needRedraw := true; end;
     $0303: begin traziPost;     drawfirstscreen; drawscreen; needRedraw := true; end;
     $0304: begin traziNedelju;  drawfirstscreen; drawscreen; needRedraw := true; end;
-    $0401: stampaj;
-    $0402: stampajPost(_g);
+    $0401: begin stampaj;         drawfirstscreen; drawscreen; needRedraw := true; end;
+    $0402: begin stampajPost(_g); drawfirstscreen; drawscreen; needRedraw := true; end;
     $0403: begin konfig;     drawfirstscreen; drawscreen; needRedraw := true; end;
     $0404: begin snimKonfig; drawfirstscreen; drawscreen; needRedraw := true; end;
     $0501: begin pomoc;      drawfirstscreen; drawscreen; needRedraw := true; end;
@@ -1366,7 +1375,9 @@ begin
         #3:       menuwork($0205);  { Ctrl-C }
         F10:
           begin
+            onNavRedraw := doMenuRedraw;
             mw := tastmenu;
+            onNavRedraw := nil;
             menuwork(mw);
           end;
       end;
