@@ -11,7 +11,7 @@ jobs:
   gate:
     uses: nikolareljin/ci-helpers/.github/workflows/pr-gate.yml@production
     with:
-      install_command: sudo apt-get install -y fpc
+      install_command: sudo apt-get update -qq && sudo apt-get install -y fpc
       build_command: bash build.sh
       check_release_tag: true
       release_branch: release/
