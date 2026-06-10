@@ -72,7 +72,7 @@ sudo apt install fpc
 bash build.sh
 ```
 
-This compiles `src/pravkal6.pas` into `./pravkal6` and copies the runtime
+This compiles `src/pravkal.pas` into `./pravkal` and copies the runtime
 `.KAL` / `.MOL` data files from `data/` to the project root (where the binary
 expects them).
 
@@ -84,9 +84,16 @@ automatically on first build.
 ## Run
 
 ```bash
-cd /path/to/KalendarFPC
-./pravkal6
+cd /path/to/PravKal
+./pravkal
 ```
+
+Options:
+
+| Flag | Description |
+|------|-------------|
+| `-h`, `--help` | Print usage and exit |
+| `-v`, `--version` | Print version and exit |
 
 The program must be launched from the directory that contains the binary
 (so that data-file lookups via `ExtractFilePath(ParamStr(0))` resolve correctly).
@@ -136,12 +143,12 @@ root by `build.sh` at build time.
 ## Project Structure
 
 ```
-KalendarFPC/
+PravKal/
 ├── build.sh            # Build + data-copy script
 ├── data/               # Canonical runtime data files
 ├── obj/                # FPC intermediate files (generated, gitignored)
 ├── src/
-│   ├── pravkal6.pas    # Main program
+│   ├── pravkal.pas     # Main program
 │   ├── kalsys1.pas     # Calendar engine (Paschalion, leap year, colours)
 │   ├── kalmenu1.pas    # Menu bar, drop-downs, function-key strip
 │   ├── kalwork1.pas    # Screen I/O, dialogs, key handling

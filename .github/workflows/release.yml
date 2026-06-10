@@ -12,6 +12,6 @@ jobs:
   release:
     uses: nikolareljin/ci-helpers/.github/workflows/fpc-release.yml@production
     with:
-      bin_name: pravkal6
+      bin_name: pravkal
       build_command: bash build.sh
       data_glob: "data/_*.KAL data/_*.MOL"
