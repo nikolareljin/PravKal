@@ -1030,15 +1030,19 @@ begin
       'a': addLine(gnd);
       'b': begin
              imnd := imened(drj, drm);
-             addLine('|' + niz(29 - (length(imnd) div 2), ' ') +
-                     imnd + niz(30 - (length(imnd) div 2), ' ') + '|');
+             addLine('|' + niz((60 - length(imnd)) div 2, ' ') + imnd +
+                     niz(60 - length(imnd) - (60 - length(imnd)) div 2, ' ') + '|');
            end;
       'c': addLine(dnd);
     else
       begin
         inc(dan);
         imnd := imepraz(drj, drm, xcv);
-        buf := '|' + dun[d_d] + ' |' + strf(dan) + ' |' + strf(drj) + ' ';
+        { Column widths from separator +---+----+-----+---...---+:
+            D=3  G=4  J+fast=5  feast=45 }
+        buf := '| ' + dun[d_d] + ' |' +
+               niz(3 - length(strf(dan)), ' ') + strf(dan) + ' |' +
+               niz(3 - length(strf(drj)), ' ') + strf(drj) + ' ';
         if _post[drm][drj] then buf := buf + BOX_BULL else buf := buf + ' ';
         buf := buf + '| ' + copy(imnd, 2, length(imnd) - 1) +
                niz(45 - length(imnd), ' ') + '|';
