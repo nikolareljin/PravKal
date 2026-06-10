@@ -346,6 +346,12 @@ end;
 
 procedure stampajPost(g: integer);
 const PAD = 15; W = 60;
+
+  procedure wline(const s: string);
+  begin
+    WriteLn(niz(PAD, ' ') + '|  ' + s + niz(W - 2 - length(s), ' ') + '|');
+  end;
+
 var i   : integer;
     pn  : string;
     ds  : string;
@@ -363,28 +369,32 @@ begin
   WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
   WriteLn(niz(PAD, ' ') + '| Visednevni postovi:' + niz(W - 20, ' ') + '|');
   WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
-  for i := 1 to 4 do
+  for i := 1 to 2 do
   begin
-    case i of
-      1: pn := 'Veliki post (Casni post)';
-      2: pn := 'Apostolski post (Petrovka)';
-      3: pn := 'Gospojinski post';
-      4: pn := 'Bozicnji post (Filipovka)';
-    else pn := '';
-    end;
-    ds := strf(postd[i][1][1]) + '.' + strf(postd[i][1][2]) + ' - ' +
+    if i = 1 then pn := 'Veliki post (Casni post)'
+             else pn := 'Apostolski post (Petrovka)';
+    ds := strf(postd[i][1][1]) + '.' + strf(postd[i][1][2]) + '. - ' +
           strf(postd[i][2][1]) + '.' + strf(postd[i][2][2]) + '.';
     WriteLn(niz(PAD, ' ') + '|  ' + pn +
             niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
   end;
+  { Fixed fasts — stored directly in _post, not in postd[3..4] }
+  pn := 'Gospojinski post';          ds := '1.8. - 14.8.';
+  WriteLn(niz(PAD, ' ') + '|  ' + pn +
+          niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
+  pn := 'Bozicnji post (Filipovka)'; ds := '14.11. - 24.12.';
+  WriteLn(niz(PAD, ' ') + '|  ' + pn +
+          niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
   WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
   WriteLn(niz(PAD, ' ') + '| Jednodevni postovi:' + niz(W - 20, ' ') + '|');
   WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
-  WriteLn(niz(PAD, ' ') + '|  Sreda i petak (celogodisnje)' + niz(W - 31, ' ') + '|');
-  WriteLn(niz(PAD, ' ') + '|  Bogojavljenjski soceljnik - 5. januar' + niz(W - 40, ' ') + '|');
-  WriteLn(niz(PAD, ' ') + '|  Usekovanje glave sv. Jovana - 29. avgust' + niz(W - 43, ' ') + '|');
+  wline('Sreda i petak (celogodisnje)');
+  wline('Bogojavljenjski soceljnik - 5. januar');
+  wline('Krstovdan (Vozdvizenje) - 14. septembar');
+  wline('Usekovanje glave sv. Jovana - 29. avgust');
   WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
-  WriteLn(niz(PAD, ' ') + '| Napomena: datumi su po Julijanskom kalendaru.' + niz(W - 46, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '| Napomena: datumi su po Julijanskom kalendaru.' +
+          niz(W - 46, ' ') + '|');
   WriteLn(niz(PAD, ' ') + '+' + niz(W, '-') + '+');
   WriteLn;
 end;

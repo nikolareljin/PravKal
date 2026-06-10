@@ -135,6 +135,7 @@ procedure applyTheme(t: integer);
 var bg: byte;
     i : integer;
 begin
+  if (t < 0) or (t > 2) then t := 0;
   colorTheme := t;
   case t of
     1: bg := $20;   { green background }
