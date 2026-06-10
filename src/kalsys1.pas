@@ -38,10 +38,13 @@ var
   scr     : pointer;
   direct  : pathstr;               { program directory, path-separator correct }
 
+  colorTheme : integer;            { 0=Plava 1=Zelena 2=CrnoBela }
+
 function prestupna_greg(g: integer): boolean;
 function prestupna_jul(g: integer): boolean;
 function indiktiong(g: integer): integer;
 procedure setconstcol;
+procedure applyTheme(t: integer);
 procedure julianEaster(year: integer; var d, m: integer);
 
 implementation
@@ -123,6 +126,32 @@ begin
   co[30] := $17;
 end;
 
+{ ── Color theme switcher ────────────────────────────────────────────── }
+{ Apply a color theme.
+  t=0 (Plava):    full restore via setconstcol — resets both fg and bg.
+  t=1 (Zelena):   replaces background nibble of every co[] entry with $20.
+  t=2 (CrnoBela): replaces background nibble with $00, high-contrast.
+  Out-of-range values are silently treated as t=0. }
+procedure applyTheme(t: integer);
+var bg: byte;
+    i : integer;
+begin
+  if (t < 0) or (t > 2) then t := 0;
+  colorTheme := t;
+  case t of
+    1: bg := $20;   { green background }
+    2: bg := $00;   { black background }
+  else bg := $10;   { blue background (default) }
+  end;
+  if t = 0 then
+  begin
+    setconstcol;
+    exit;
+  end;
+  for i := 0 to 30 do
+    co[i] := bg or (co[i] and $0F);
+end;
+
 { ── Month names (Serbian Latin) ────────────────────────────────────── }
 
 procedure initMonthNames;
@@ -188,8 +217,9 @@ end;
 { ── Unit initialisation ─────────────────────────────────────────── }
 
 begin
-  seg_scr := $B800;   { stub; not used for actual video access }
-  scr     := nil;
+  seg_scr    := $B800;   { stub; not used for actual video access }
+  scr        := nil;
+  colorTheme := 0;
   setconstcol;
   initMonthNames;
   initKrst1;

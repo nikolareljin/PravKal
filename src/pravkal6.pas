@@ -1288,6 +1288,11 @@ begin
     $0303: begin traziPost;     drawfirstscreen; drawscreen; needRedraw := true; end;
     $0304: begin traziNedelju;  drawfirstscreen; drawscreen; needRedraw := true; end;
     $0401: stampaj;
+    $0402: stampajPost(_g);
+    $0403: begin konfig;     drawfirstscreen; drawscreen; needRedraw := true; end;
+    $0404: begin snimKonfig; drawfirstscreen; drawscreen; needRedraw := true; end;
+    $0501: begin pomoc;      drawfirstscreen; drawscreen; needRedraw := true; end;
+    $0502: begin sadrzaj;    drawfirstscreen; drawscreen; needRedraw := true; end;
   end;
   { Restore function-key bar (was: move video buffer row back) }
   showkeyfunc(5);
@@ -1322,10 +1327,12 @@ begin
               needRedraw := true;
             end;
           end;
+        F1:       menuwork($0501);
         F3:       menuwork($0201);
         #16:      menuwork($0202);  { Ctrl-P }
         F5:       menuwork($0203);
         F7:       menuwork($0401);
+        F8:       menuwork($0402);
         #3:       menuwork($0205);  { Ctrl-C }
         F10:
           begin
@@ -1397,6 +1404,7 @@ begin
   { Stub: keep seg_scr for any code that reads it; no video buffer access }
   seg_scr := $B800;
   setconstcol;
+  ucitajKonfig;     { load saved theme before any screen painting }
   pocetak;
   initialization_; { see procedure initialization_ above }
   drawfirstscreen;
