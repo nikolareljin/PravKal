@@ -3,7 +3,7 @@
 TUI calendar for the Serbian Orthodox Church, ported from the original DOS
 Turbo Pascal 6/7 program to Free Pascal (FPC) for Linux, Windows, and macOS.
 
-**Original authors:** Nikola Reljin, Ivona Maric, Nikola Lecic  
+**Original authors:** Ivona Maric, Nikola Lecic, Nikola Reljin  
 **Original source:** Turbo Pascal 6/7, DOS, ~1260 lines  
 **This port:** Free Pascal 3.x, cross-platform TUI (`crt` unit)
 
