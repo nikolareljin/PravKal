@@ -509,6 +509,17 @@ begin
   end;
   {$I-}
   WriteLn(f, 'theme=' + strf(colorTheme));
+  {$I+}
+  if IOResult <> 0 then
+  begin
+    {$I-} Close(f); {$I+}  { best-effort close }
+    openwind(15, 11, 65, 14, co[27], co[27], ' Greska ', 0,
+             false, false, false, false, wsingle, 0, 0, true, false, 0);
+    elwritecol(17, 12, 'Greska pri pisanju: ' + fname, co[6]);
+    waitKey(' Taster za nastavak... ');
+    exit;
+  end;
+  {$I-}
   Close(f);
   {$I+}
   if IOResult <> 0 then
