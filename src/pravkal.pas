@@ -1,7 +1,7 @@
 {$mode tp}
 {$H-}
 program pravkal;
-uses crt, SysUtils, nizz, kalsys1, kalmenu1, kalwork1;
+uses crt, SysUtils, nizz, kalsys1, kalmenu1, kalwork1, kaltxt;
 
 const
   VERSION = '0.1.0';
@@ -20,8 +20,8 @@ begin
   WriteLn('  Up/Down        Scroll weeks within current month');
   WriteLn('  F3             Change month / year');
   WriteLn('  F5             Heortology viewer (feast-day texts)');
-  WriteLn('  F7             Print current month to stdout');
-  WriteLn('  F8             Print fasting schedule');
+  WriteLn('  F7             Export current month to TXT (mesec_YYYY_MM.txt)');
+  WriteLn('  F8             Export fasting schedule to TXT (postovi_YYYY.txt)');
   WriteLn('  F10            Drop-down menu');
   WriteLn('  Ctrl-C         Exit');
   Halt(0);
@@ -523,7 +523,7 @@ begin
   mainh[1] := 'Desk informacije';
   mainh[2] := 'Glavne komande (promena datuma, tabela postova, izlazak)';
   mainh[3] := 'Pretrazivanja u kalendaru (nalazenja imena praznika, nedelja, itd.)';
-  mainh[4] := 'Stampanje kalendara ili tabele postova na stampacu';
+  mainh[4] := 'Izvoz mesecnog kalendara ili tabele postova u TXT';
   mainh[5] := 'Pomoc i uputstvo za koriscenje Pravoslavnog kalendara';
   for gu := 1 to mmmax do
   begin
@@ -544,8 +544,8 @@ begin
   mmsss[3][2] := 'Trazenje praznika';
   mmsss[3][3] := 'Trazenje posta';
   mmsss[3][4] := 'Trazenje nedelje';
-  mmsss[4][1] := 'Stampanje meseca      F7';
-  mmsss[4][2] := 'Stampanje postova     F8';
+  mmsss[4][1] := 'Izvoz meseca u TXT    F7';
+  mmsss[4][2] := 'Izvoz postova u TXT  F8';
   mmsss[4][3] := 'Konfiguracija';
   mmsss[4][4] := 'Snimanje kofiguracije';
   mmsss[5][1] := 'Pomoc          F1';
@@ -992,50 +992,81 @@ end;
 
 procedure stampaj;
 var qww, dan, drj, drm, xcv, d_d, tg: integer;
-    imnd: prstr;
-    nuv : string[20];
+    imnd : prstr;
+    buf  : string;
+    fname: string;
+    lines: TKTXTLines;
+    nl   : integer;
+
+  procedure addLine(const s: string);
+  begin
+    if nl < KTXT_MAXLINES then begin lines[nl] := s; inc(nl); end;
+  end;
+
 begin
-  nuv := niz(15, ' ');
-  WriteLn;
-  for tg := 1 to 6 do WriteLn(niz(42, ' ') + krst1[tg]);
-  WriteLn;
-  WriteLn(nuv + '+' + niz(60, '-') + '+');
-  Write(nuv + '| ' + strf(_g) + niz(4 - length(strf(_g)), ' ') +
-        niz(25 - (length(imm[_m]) div 2), ' ') +
-        upcasestr(imm[_m]) +
-        niz(21 - (length(imm[_m]) div 2), ' '));
-  if length(imm[_m]) mod 2 = 0 then Write(' ');
-  WriteLn(niz(4 - length(da), ' ') + strf(brmdg(_m, _g)) + ' ' + da + ' |');
-  WriteLn(nuv + dnd);
-  WriteLn(nuv + '| D |  G |  J  | Pravoslavni praznik' + niz(25, ' ') + '|');
-  if mtt__ <> 2 then WriteLn(nuv + pktab) else WriteLn(nuv + gnd);
+  nl    := 0;
+  fname := direct + 'mesec_' + strf(_g) + '_';
+  if _m < 10 then fname := fname + '0';
+  fname := fname + strf(_m) + '.txt';
+
+  for tg := 1 to 6 do addLine(krst1[tg]);
+  addLine('');
+  addLine('+' + niz(60, '-') + '+');
+  buf := '| ' + strf(_g) + niz(4 - length(strf(_g)), ' ') +
+         niz(25 - (length(imm[_m]) div 2), ' ') +
+         upcasestr(imm[_m]) +
+         niz(21 - (length(imm[_m]) div 2), ' ');
+  if length(imm[_m]) mod 2 = 0 then buf := buf + ' ';
+  buf := buf + niz(4 - length(da), ' ') + strf(brmdg(_m, _g)) + ' ' + da + ' |';
+  addLine(buf);
+  addLine(dnd);
+  addLine('| D |  G |  J  | Pravoslavni praznik' + niz(25, ' ') + '|');
+  if mtt__ <> 2 then addLine(pktab) else addLine(gnd);
+
   drj := di; drm := mi; xcv := gi; d_d := _dd; qww := mtt__; dan := 0;
   while dan < brmdg(_m, _g) do
   begin
     case tabs[qww] of
-      'a': WriteLn(nuv + gnd);
+      'a': addLine(gnd);
       'b': begin
              imnd := imened(drj, drm);
-             WriteLn(nuv + '|' + niz(29 - (length(imnd) div 2), ' ') +
+             addLine('|' + niz(29 - (length(imnd) div 2), ' ') +
                      imnd + niz(30 - (length(imnd) div 2), ' ') + '|');
            end;
-      'c': WriteLn(nuv + dnd);
+      'c': addLine(dnd);
     else
       begin
         inc(dan);
         imnd := imepraz(drj, drm, xcv);
-        Write(nuv + '|' + dun[d_d] + ' |' + strf(dan) + ' |' +
-              strf(drj) + ' ');
-        if _post[drm][drj] then Write(BOX_BULL) else Write(' ');
-        Write('| ' + copy(imnd, 2, length(imnd) - 1));
-        WriteLn(niz(45 - length(imnd), ' ') + '|');
+        buf := '|' + dun[d_d] + ' |' + strf(dan) + ' |' + strf(drj) + ' ';
+        if _post[drm][drj] then buf := buf + BOX_BULL else buf := buf + ' ';
+        buf := buf + '| ' + copy(imnd, 2, length(imnd) - 1) +
+               niz(45 - length(imnd), ' ') + '|';
+        addLine(buf);
         inc(d_d); if d_d = 7 then d_d := 0;
         uvecjul(drj, drm, xcv);
       end;
     end;
     inc(qww);
   end;
-  WriteLn(nuv + zatvtab);
+  addLine(zatvtab);
+
+  if writeTXTLines(fname, nl, lines) then
+  begin
+    openwind(8, 10, 71, 15, co[27], co[27], ' Izvoz u TXT ', 0,
+             false, false, false, false, wsingle, 0, 0, true, false, 0);
+    elwritecol(10, 11, 'TXT snimljen:', co[4]);
+    elwritecol(10, 12, fname, co[15]);
+    waitKey('');
+  end
+  else
+  begin
+    openwind(8, 10, 71, 15, co[27], co[27], ' Greska ', 0,
+             false, false, false, false, wsingle, 0, 0, true, false, 0);
+    elwritecol(10, 11, 'Greska pri snimanju TXT fajla!', co[6]);
+    elwritecol(10, 12, fname, co[17]);
+    waitKey('');
+  end;
 end;
 
 { ── String input helper ──────────────────────────────────────────── }
