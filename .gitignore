@@ -9,6 +9,8 @@ PPas*.bat
 PPas*.sh
 
 # Compiled binary
+pravkal
+pravkal.exe
 pravkal6
 pravkal6.exe
 
@@ -21,6 +23,9 @@ pravkal6.exe
 /_PRAZ5.KAL
 /_PRAZ6.KAL
 /_GRESKE.MOL
+
+# Local scratch files
+TODO.md
 
 # OS noise
 .DS_Store

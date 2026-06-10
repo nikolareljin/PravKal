@@ -3,7 +3,7 @@
 ## Unit Dependency Graph
 
 ```
-pravkal6.pas (main program)
+pravkal.pas (main program)
   ├── crt          (FPC standard — terminal I/O)
   ├── SysUtils     (FPC standard — date/path utilities)
   ├── nizz.pas     (string utils, shared types)
@@ -37,17 +37,17 @@ Precomputed Julian Easter dates for the 532-year Great Indiction cycle
 starting at `__indiktg = 1941`. Populated at unit initialisation via
 `julianEaster()`. Index `i` = cycle year `__indiktg + i - 1`.
 
-### `praz[1..12][1..31]: array of prstr` (pravkal6)
+### `praz[1..12][1..31]: array of prstr` (pravkal)
 Fixed-feast name strings, one per Julian calendar day. Prefix character
 encodes feast rank: `'c'` = major (red-letter), `'m'` = middle, `'o'` = minor.
 Easter-movable feasts overlay `praz` via `pok_[1..11]` lookup at runtime.
 
-### `_post[1..12][1..31]: array of boolean` (pravkal6)
+### `_post[1..12][1..31]: array of boolean` (pravkal)
 Fasting-day grid computed each year by `setpost`. Set to `true` for every
 Julian calendar day that is a fasting day. Built from fixed fasts and the
 Great Lent / Apostles' Fast windows derived from Easter.
 
-### `tabs[1..63]: array of char` (pravkal6)
+### `tabs[1..63]: array of char` (pravkal)
 63-character layout driver for the calendar grid. Period-10 repeating pattern:
 ```
 a b c 0 1 2 3 4 5 6  (repeated 6×, plus abc)
@@ -80,7 +80,7 @@ scrolling via ↑/↓ arrows.
 
 ## Julian Calendar Conversion
 
-`setjulijan(d, m, y, jd, jm, jy, forward)` in `pravkal6.pas` converts
+`setjulijan(d, m, y, jd, jm, jy, forward)` in `pravkal.pas` converts
 between Gregorian and Julian dates using the per-century offset table:
 
 | Century | Extra days |
@@ -128,7 +128,7 @@ Built by `setuskrs` from the computed Julian Easter date:
 
 1. Write the dialog procedure in `kalwork1.pas` (use `openwind`, `elwritecol`,
    `waitKey` pattern — see `tabpost` or `tabindikt` for examples).
-2. Add a `menuwork` case entry in `pravkal6.pas`:
+2. Add a `menuwork` case entry in `pravkal.pas`:
    ```pascal
    $XXYY: begin myDialog; drawfirstscreen; drawscreen; needRedraw := true; end;
    ```
@@ -157,7 +157,7 @@ I/O — it can be used directly in a Lazarus LCL project. The recommended approa
 1. Create a new Lazarus project targeting LCL.
 2. Add `kalsys1.pas` and `nizz.pas` to the project; compile with `{$mode tp}`.
 3. Replace `kalmenu1.pas` and `kalwork1.pas` with LCL forms and components.
-4. Replace `tabs`-based row rendering in `pravkal6.pas` with a `TStringGrid`
+4. Replace `tabs`-based row rendering in `pravkal.pas` with a `TStringGrid`
    or custom `TCanvas`-painted component.
 5. The `setpost`, `setuskrs`, `kalendar` logic can be adapted to populate
    the grid rows directly.

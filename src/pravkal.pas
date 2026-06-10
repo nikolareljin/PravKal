@@ -1,7 +1,37 @@
 {$mode tp}
 {$H-}
-program pravoslavni_kalendar;
+program pravkal;
 uses crt, SysUtils, nizz, kalsys1, kalmenu1, kalwork1;
+
+const
+  VERSION = '0.1.0';
+
+procedure showHelp;
+begin
+  WriteLn('Pravoslavni Kalendar - Serbian Orthodox TUI Calendar');
+  WriteLn;
+  WriteLn('Usage:  pravkal [options]');
+  WriteLn;
+  WriteLn('Options:');
+  WriteLn('  -h, --help     Show this help and exit');
+  WriteLn('  -v, --version  Show version and exit');
+  WriteLn;
+  WriteLn('Controls:');
+  WriteLn('  Up/Down        Scroll weeks within current month');
+  WriteLn('  F3             Change month / year');
+  WriteLn('  F5             Heortology viewer (feast-day texts)');
+  WriteLn('  F7             Print current month to stdout');
+  WriteLn('  F8             Print fasting schedule');
+  WriteLn('  F10            Drop-down menu');
+  WriteLn('  Ctrl-C         Exit');
+  Halt(0);
+end;
+
+procedure showVersion;
+begin
+  WriteLn('pravkal ' + VERSION);
+  Halt(0);
+end;
 
 type
   nedstr = string[58];
@@ -1266,10 +1296,19 @@ begin
   until false;
 end;
 
+{ Restores the full screen — used as the tastmenu navigation callback. }
+procedure doMenuRedraw;
+begin
+  drawfirstscreen;
+  drawscreen;
+  kalendar;
+end;
+
 procedure menuwork(mewo: word);
 var dali: boolean;
 begin
   case mewo of
+    0:     begin drawfirstscreen; drawscreen; needRedraw := true; end;
     $0101: begin about;         drawfirstscreen; drawscreen; needRedraw := true; end;
     $0201: begin
              dali := setdat(_m, _g);
@@ -1287,8 +1326,8 @@ begin
     $0302: begin traziPraznik;  drawfirstscreen; drawscreen; needRedraw := true; end;
     $0303: begin traziPost;     drawfirstscreen; drawscreen; needRedraw := true; end;
     $0304: begin traziNedelju;  drawfirstscreen; drawscreen; needRedraw := true; end;
-    $0401: stampaj;
-    $0402: stampajPost(_g);
+    $0401: begin stampaj;         drawfirstscreen; drawscreen; needRedraw := true; end;
+    $0402: begin stampajPost(_g); drawfirstscreen; drawscreen; needRedraw := true; end;
     $0403: begin konfig;     drawfirstscreen; drawscreen; needRedraw := true; end;
     $0404: begin snimKonfig; drawfirstscreen; drawscreen; needRedraw := true; end;
     $0501: begin pomoc;      drawfirstscreen; drawscreen; needRedraw := true; end;
@@ -1336,7 +1375,9 @@ begin
         #3:       menuwork($0205);  { Ctrl-C }
         F10:
           begin
+            onNavRedraw := doMenuRedraw;
             mw := tastmenu;
+            onNavRedraw := nil;
             menuwork(mw);
           end;
       end;
@@ -1400,7 +1441,19 @@ end;
 
 { ================================================================== }
 
+procedure parseArgs;
+var i: integer; a: string;
 begin
+  for i := 1 to ParamCount do
+  begin
+    a := ParamStr(i);
+    if (a = '-h') or (a = '--help')    then showHelp;
+    if (a = '-v') or (a = '--version') then showVersion;
+  end;
+end;
+
+begin
+  parseArgs;
   { Stub: keep seg_scr for any code that reads it; no video buffer access }
   seg_scr := $B800;
   setconstcol;
