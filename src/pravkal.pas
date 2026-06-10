@@ -4,7 +4,7 @@ program pravkal;
 uses crt, SysUtils, nizz, kalsys1, kalmenu1, kalwork1, kaltxt;
 
 const
-  VERSION = '0.1.0';
+  VERSION = '0.2.0';
 
 procedure showHelp;
 begin
