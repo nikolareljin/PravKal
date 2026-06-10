@@ -9,7 +9,7 @@ unit kalwork1;
 
 interface
 
-uses crt, nizz, kalsys1, kalmenu1, SysUtils;
+uses crt, nizz, kalsys1, kalmenu1, SysUtils, kaltxt;
 
 var
   { Fasting-period boundary dates: postd[period][1/2][1/2]
@@ -342,61 +342,81 @@ begin
   waitKey(' Pritisnite bilo koji taster... ');
 end;
 
-{ ── Print fasting schedule to stdout (like stampaj for months) ──────── }
+{ ── Export fasting schedule to plain-text file (F8) ─────────────── }
 
 procedure stampajPost(g: integer);
-const PAD = 15; W = 60;
+const W = 60;
+var lines : TKTXTLines;
+    nl    : integer;
+    fname : string;
+    pn, ds, hdr : string;
+    i : integer;
+
+  procedure addLine(const s: string);
+  begin
+    if nl < KTXT_MAXLINES then begin lines[nl] := s; inc(nl); end;
+  end;
 
   procedure wline(const s: string);
   begin
-    WriteLn(niz(PAD, ' ') + '|  ' + s + niz(W - 2 - length(s), ' ') + '|');
+    addLine('|  ' + s + niz(W - 2 - length(s), ' ') + '|');
   end;
 
-var i   : integer;
-    pn  : string;
-    ds  : string;
-    hdr : string;
 begin
-  WriteLn;
-  for i := 1 to 6 do WriteLn(niz(PAD, ' ') + krst1[i]);
-  WriteLn;
+  nl    := 0;
+  fname := direct + 'postovi_' + strf(g) + '.txt';
+
+  for i := 1 to 6 do addLine(krst1[i]);
+  addLine('');
   hdr := 'POSTOVI ' + strf(g);
-  WriteLn(niz(PAD, ' ') + '+' + niz(W, '-') + '+');
-  WriteLn(niz(PAD, ' ') + '|' +
-          niz((W - length(hdr)) div 2, ' ') + hdr +
+  addLine('+' + niz(W, '-') + '+');
+  addLine('|' + niz((W - length(hdr)) div 2, ' ') + hdr +
           niz(W - length(hdr) - (W - length(hdr)) div 2, ' ') + '|');
-  WriteLn(niz(PAD, ' ') + '+' + niz(W, '-') + '+');
-  WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
-  WriteLn(niz(PAD, ' ') + '| Visednevni postovi:' + niz(W - 20, ' ') + '|');
-  WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
+  addLine('+' + niz(W, '-') + '+');
+  addLine('|' + niz(W, ' ') + '|');
+  addLine('| Visednevni postovi:' + niz(W - 20, ' ') + '|');
+  addLine('|' + niz(W, ' ') + '|');
   for i := 1 to 2 do
   begin
     if i = 1 then pn := 'Veliki post (Casni post)'
              else pn := 'Apostolski post (Petrovka)';
     ds := strf(postd[i][1][1]) + '.' + strf(postd[i][1][2]) + '. - ' +
           strf(postd[i][2][1]) + '.' + strf(postd[i][2][2]) + '.';
-    WriteLn(niz(PAD, ' ') + '|  ' + pn +
-            niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
+    addLine('|  ' + pn + niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
   end;
-  { Fixed fasts — stored directly in _post, not in postd[3..4] }
+  { Fixed fasts }
   pn := 'Gospojinski post';          ds := '1.8. - 14.8.';
-  WriteLn(niz(PAD, ' ') + '|  ' + pn +
-          niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
+  addLine('|  ' + pn + niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
   pn := 'Bozicnji post (Filipovka)'; ds := '14.11. - 24.12.';
-  WriteLn(niz(PAD, ' ') + '|  ' + pn +
-          niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
-  WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
-  WriteLn(niz(PAD, ' ') + '| Jednodevni postovi:' + niz(W - 20, ' ') + '|');
-  WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
+  addLine('|  ' + pn + niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
+  addLine('|' + niz(W, ' ') + '|');
+  addLine('| Jednodevni postovi:' + niz(W - 20, ' ') + '|');
+  addLine('|' + niz(W, ' ') + '|');
   wline('Sreda i petak (celogodisnje)');
   wline('Bogojavljenjski soceljnik - 5. januar');
   wline('Krstovdan (Vozdvizenje) - 14. septembar');
   wline('Usekovanje glave sv. Jovana - 29. avgust');
-  WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
-  WriteLn(niz(PAD, ' ') + '| Napomena: datumi su po Julijanskom kalendaru.' +
+  addLine('|' + niz(W, ' ') + '|');
+  addLine('| Napomena: datumi su po Julijanskom kalendaru.' +
           niz(W - 46, ' ') + '|');
-  WriteLn(niz(PAD, ' ') + '+' + niz(W, '-') + '+');
-  WriteLn;
+  addLine('+' + niz(W, '-') + '+');
+
+  if writeTXTLines(fname, nl, lines) then
+  begin
+    openwind(8, 10, 71, 15, co[27], co[27], ' Izvoz u TXT ', 0,
+             false, false, false, false, wsingle, 0, 0, true, false, 0);
+    elwritecol(10, 11, 'TXT snimljen:', co[4]);
+    elwritecol(10, 12, fname, co[15]);
+    waitKey('');
+  end
+  else
+  begin
+    openwind(8, 10, 71, 15, co[27], co[27], ' Greska ', 0,
+             false, false, false, false, wsingle, 0, 0, true, false, 0);
+    elwritecol(10, 11, 'Greska pri snimanju TXT fajla!', co[6]);
+    elwritecol(10, 12, fname, co[17]);
+    waitKey('');
+  end;
 end;
 
 { ── Help: keyboard shortcuts (F1) ──────────────────────────────────── }
@@ -411,8 +431,8 @@ begin
   elwritecol(X1+4, Y1+3,  'F1          Pomoc (ova poruka)', co[17]);
   elwritecol(X1+4, Y1+4,  'F3          Promena aktivnog datuma', co[17]);
   elwritecol(X1+4, Y1+5,  'F5          Heortologija (tekstovi praznika)', co[17]);
-  elwritecol(X1+4, Y1+6,  'F7          Stampanje meseca na stampacu', co[17]);
-  elwritecol(X1+4, Y1+7,  'F8          Stampanje postova na stampacu', co[17]);
+  elwritecol(X1+4, Y1+6,  'F7          Izvoz meseca u TXT fajl', co[17]);
+  elwritecol(X1+4, Y1+7,  'F8          Izvoz postova u TXT fajl', co[17]);
   elwritecol(X1+4, Y1+8,  'F10         Aktiviranje menija', co[17]);
   elwritecol(X1+4, Y1+9,  'Ctrl-P      Tabela postova za godinu', co[17]);
   elwritecol(X1+4, Y1+10, 'Ctrl-C      Izlazak iz programa', co[17]);
@@ -441,8 +461,8 @@ begin
   elwritecol(X1+4, Y1+9,  'Promena datuma, tabela postova, heortologija, indiktion.', co[17]);
   elwritecol(X1+2, Y1+11, '3. TRAGANJE (meni)', co[4]);
   elwritecol(X1+4, Y1+12, 'Pretraga po datumu, prazniku, postu ili liturgijskoj nedelji.', co[17]);
-  elwritecol(X1+2, Y1+14, '4. STAMPANJE (F7 / F8)', co[4]);
-  elwritecol(X1+4, Y1+15, 'Stampanje mesecnog kalendara ili tabele postova.', co[17]);
+  elwritecol(X1+2, Y1+14, '4. IZVOZ (F7 / F8)', co[4]);
+  elwritecol(X1+4, Y1+15, 'Izvoz mesecnog kalendara ili tabele postova u TXT.', co[17]);
   elwritecol(X1+2, Y1+17, 'Napomena: datumi su po julijanskom (starom) kalendaru.', co[6]);
   waitKey(' Pritisnite bilo koji taster... ');
 end;
