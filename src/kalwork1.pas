@@ -37,6 +37,12 @@ function  setdat(var m, g: integer): boolean;
 procedure tabpost(g: integer);
 procedure helppraz;
 procedure tabindikt;
+procedure stampajPost(g: integer);
+procedure pomoc;
+procedure sadrzaj;
+procedure konfig;
+procedure snimKonfig;
+procedure ucitajKonfig;
 
 implementation
 
@@ -334,6 +340,201 @@ begin
       co[17]);
   end;
   waitKey(' Pritisnite bilo koji taster... ');
+end;
+
+{ ── Print fasting schedule to stdout (like stampaj for months) ──────── }
+
+procedure stampajPost(g: integer);
+const PAD = 15; W = 60;
+var i   : integer;
+    pn  : string;
+    ds  : string;
+    hdr : string;
+begin
+  WriteLn;
+  for i := 1 to 6 do WriteLn(niz(PAD, ' ') + krst1[i]);
+  WriteLn;
+  hdr := 'POSTOVI ' + strf(g);
+  WriteLn(niz(PAD, ' ') + '+' + niz(W, '-') + '+');
+  WriteLn(niz(PAD, ' ') + '|' +
+          niz((W - length(hdr)) div 2, ' ') + hdr +
+          niz(W - length(hdr) - (W - length(hdr)) div 2, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '+' + niz(W, '-') + '+');
+  WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '| Visednevni postovi:' + niz(W - 20, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
+  for i := 1 to 4 do
+  begin
+    case i of
+      1: pn := 'Veliki post (Casni post)';
+      2: pn := 'Apostolski post (Petrovka)';
+      3: pn := 'Gospojinski post';
+      4: pn := 'Bozicnji post (Filipovka)';
+    else pn := '';
+    end;
+    ds := strf(postd[i][1][1]) + '.' + strf(postd[i][1][2]) + ' - ' +
+          strf(postd[i][2][1]) + '.' + strf(postd[i][2][2]) + '.';
+    WriteLn(niz(PAD, ' ') + '|  ' + pn +
+            niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
+  end;
+  WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '| Jednodevni postovi:' + niz(W - 20, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '|  Sreda i petak (celogodisnje)' + niz(W - 31, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '|  Bogojavljenjski soceljnik - 5. januar' + niz(W - 40, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '|  Usekovanje glave sv. Jovana - 29. avgust' + niz(W - 43, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '|' + niz(W, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '| Napomena: datumi su po Julijanskom kalendaru.' + niz(W - 46, ' ') + '|');
+  WriteLn(niz(PAD, ' ') + '+' + niz(W, '-') + '+');
+  WriteLn;
+end;
+
+{ ── Help: keyboard shortcuts (F1) ──────────────────────────────────── }
+
+procedure pomoc;
+const X1 = 5; Y1 = 3; X2 = 74; Y2 = 22;
+begin
+  openwind(X1, Y1, X2, Y2, co[27], co[27],
+           ' Pomoc - Tastatura ', 0,
+           false, false, false, false, wsingle, 0, 0, true, false, 0);
+  elwritecol(X1+2, Y1+2,  'Tastatura:', co[4]);
+  elwritecol(X1+4, Y1+3,  'F1          Pomoc (ova poruka)', co[17]);
+  elwritecol(X1+4, Y1+4,  'F3          Promena aktivnog datuma', co[17]);
+  elwritecol(X1+4, Y1+5,  'F5          Heortologija (tekstovi praznika)', co[17]);
+  elwritecol(X1+4, Y1+6,  'F7          Stampanje meseca na stampacu', co[17]);
+  elwritecol(X1+4, Y1+7,  'F8          Stampanje postova na stampacu', co[17]);
+  elwritecol(X1+4, Y1+8,  'F10         Aktiviranje menija', co[17]);
+  elwritecol(X1+4, Y1+9,  'Ctrl-P      Tabela postova za godinu', co[17]);
+  elwritecol(X1+4, Y1+10, 'Ctrl-C      Izlazak iz programa', co[17]);
+  elwritecol(X1+4, Y1+11, 'PgUp/PgDn   Pomeranje prikaza gore/dole', co[17]);
+  elwritecol(X1+2, Y1+13, 'Boje praznika u kalendaru:', co[4]);
+  elwritecol(X1+4, Y1+14, 'Zuto  = Nedeljni dan / Veliki praznik', co[15]);
+  elwritecol(X1+4, Y1+15, 'Plavo = Srednji praznik', co[16]);
+  elwritecol(X1+4, Y1+16, 'Sivo  = Manji praznik', co[17]);
+  elwritecol(X1+4, Y1+17, '*     = Posni dan', co[19]);
+  waitKey(' Pritisnite bilo koji taster... ');
+end;
+
+{ ── Help: table of contents (Sadrzaj) ───────────────────────────────── }
+
+procedure sadrzaj;
+const X1 = 5; Y1 = 3; X2 = 74; Y2 = 22;
+begin
+  openwind(X1, Y1, X2, Y2, co[27], co[27],
+           ' Sadrzaj - Uputstvo ', 0,
+           false, false, false, false, wsingle, 0, 0, true, false, 0);
+  elwritecol(X1+2, Y1+2,  'Pravoslavni kalendar v6 - pregled funkcija:', co[15]);
+  elwritecol(X1+2, Y1+4,  '1. KALENDAR (glavna strana)', co[4]);
+  elwritecol(X1+4, Y1+5,  'Mesecni prikaz pravoslavnih praznika.', co[17]);
+  elwritecol(X1+4, Y1+6,  'G = Gregorijanski dan, J = Julijanski dan, boja = rang praznika.', co[17]);
+  elwritecol(X1+2, Y1+8,  '2. OPCIJE (meni, F3/F5/Ctrl-P)', co[4]);
+  elwritecol(X1+4, Y1+9,  'Promena datuma, tabela postova, heortologija, indiktion.', co[17]);
+  elwritecol(X1+2, Y1+11, '3. TRAGANJE (meni)', co[4]);
+  elwritecol(X1+4, Y1+12, 'Pretraga po datumu, prazniku, postu ili liturgijskoj nedelji.', co[17]);
+  elwritecol(X1+2, Y1+14, '4. STAMPANJE (F7 / F8)', co[4]);
+  elwritecol(X1+4, Y1+15, 'Stampanje mesecnog kalendara ili tabele postova.', co[17]);
+  elwritecol(X1+2, Y1+17, 'Napomena: svi datumi praznika su po Julijanskom (starom) kalendaru.', co[6]);
+  waitKey(' Pritisnite bilo koji taster... ');
+end;
+
+{ ── Configuration dialog ────────────────────────────────────────────── }
+
+procedure konfig;
+const
+  X1 = 18; Y1 = 7; X2 = 61; Y2 = 18;
+  NTHEMES = 3;
+  TNAMES  : array[1..NTHEMES] of string[22] = (
+    'Plava (podrazumevana)', 'Zelena', 'Crno-bela');
+var
+  sel, orig, i : integer;
+  k            : char;
+begin
+  orig := colorTheme;
+  sel  := colorTheme + 1;
+  repeat
+    applyTheme(sel - 1);
+    openwind(X1, Y1, X2, Y2, co[27], co[27],
+             ' Konfiguracija ', 0,
+             false, false, false, false, wsingle, 0, 0, true, false, 0);
+    elwritecol(X1+2, Y1+2, 'Tema ekrana:', co[4]);
+    for i := 1 to NTHEMES do
+      if i = sel then
+        elwritecol(X1+4, Y1+3+i, '> ' + TNAMES[i], co[15])
+      else
+        elwritecol(X1+4, Y1+3+i, '  ' + TNAMES[i], co[17]);
+    elwritecol(X1+2, Y1+8, 'Strelice = izbor,  Enter = primeni', co[17]);
+    elwritecol(X1+2, Y1+9, 'Esc = odustani (vraca prethodnu temu)', co[17]);
+    k := ReadKey;
+    if k = #0 then k := ReadKey;
+    case k of
+      upkey:   if sel > 1 then dec(sel) else sel := NTHEMES;
+      downkey: if sel < NTHEMES then inc(sel) else sel := 1;
+      enterkey: exit;
+      esckey:
+        begin
+          applyTheme(orig);
+          exit;
+        end;
+    end;
+  until false;
+end;
+
+{ ── Save configuration to KALENDAR.CFG ──────────────────────────────── }
+
+procedure snimKonfig;
+var f     : text;
+    fname : string;
+begin
+  fname := direct + 'KALENDAR.CFG';
+  {$I-}
+  Assign(f, fname);
+  Rewrite(f);
+  {$I+}
+  if IOResult <> 0 then
+  begin
+    openwind(15, 11, 65, 14, co[27], co[27], ' Greska ', 0,
+             false, false, false, false, wsingle, 0, 0, true, false, 0);
+    elwritecol(17, 12, 'Ne mogu snimiti: ' + fname, co[6]);
+    waitKey(' Taster za nastavak... ');
+    exit;
+  end;
+  WriteLn(f, 'theme=' + strf(colorTheme));
+  Close(f);
+  openwind(15, 11, 65, 14, co[27], co[27], ' Konfiguracija snimljena ', 0,
+           false, false, false, false, wsingle, 0, 0, true, false, 0);
+  elwritecol(17, 12, 'Snimljeno: ' + fname, co[4]);
+  waitKey(' Taster za nastavak... ');
+end;
+
+{ ── Load configuration from KALENDAR.CFG ────────────────────────────── }
+
+procedure ucitajKonfig;
+var f     : text;
+    fname : string;
+    line  : string;
+    p, t  : integer;
+    code  : integer;
+begin
+  fname := direct + 'KALENDAR.CFG';
+  {$I-}
+  Assign(f, fname);
+  Reset(f);
+  {$I+}
+  if IOResult <> 0 then exit;
+  while not EOF(f) do
+  begin
+    ReadLn(f, line);
+    p := Pos('=', line);
+    if p > 0 then
+    begin
+      if Copy(line, 1, p-1) = 'theme' then
+      begin
+        Val(Copy(line, p+1, Length(line)), t, code);
+        if code = 0 then applyTheme(t);
+      end;
+    end;
+  end;
+  Close(f);
 end;
 
 begin
