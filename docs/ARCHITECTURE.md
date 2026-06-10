@@ -1,5 +1,10 @@
 # Architecture Notes
 
+> **See also:** [orthodox-calendar](https://github.com/nikolareljin/orthodox-calendar) —
+> the modern multi-tradition successor to PravKal. It implements the same
+> Paschalion and Julian conversion logic in Python/FastAPI with a React frontend,
+> covering 17 traditions and 1100+ saints.
+
 ## Unit Dependency Graph
 
 ```

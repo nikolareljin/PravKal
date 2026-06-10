@@ -9,6 +9,24 @@ Turbo Pascal 6/7 program to Free Pascal (FPC) for Linux, Windows, and macOS.
 
 ---
 
+## О програму / About (српски)
+
+**PravKal** је текстуални (TUI) православни календар за Српску Православну Цркву.
+Прикaзује паралелне григоријанске и јулијанске датуме, покретне и непокретне
+празнике, дане поста и византијску годину. Програм је порт оригиналног DOS
+програма написаног у Turbo Pascal-у — прилагођен за рад на савременим
+системима (Linux, Windows, macOS) уз помоћ Free Pascal компилатора.
+
+Функције:
+- Приказ месечног календара са јулијанским датумима
+- Пасхалион: израчунавање датума Васкрса по 532-годишњем циклусу
+- Означавање дана поста (`*`)
+- Извоз месечног календара и табеле постова у TXT фајл (F7 / F8)
+- Хеортологија: текстови за велике празнике (F5)
+- Byzantијска година и индикт
+
+---
+
 ## Screenshots
 
 **Main calendar view** — parallel Gregorian (G) and Julian (J) columns, feast-day
@@ -107,7 +125,8 @@ The program must be launched from the directory that contains the binary
 | ↑ / ↓ | Scroll weeks within current month |
 | F3 | Change month / year dialog |
 | F5 | Heortology viewer (feast-day texts from .KAL files) |
-| F7 | Print current month to stdout |
+| F7 | Export current month to TXT (`mesec_YYYY_MM.txt`) |
+| F8 | Export fasting schedule to TXT (`postovi_YYYY.txt`) |
 | F10 | Drop-down menu |
 | Ctrl-C | Exit |
 
@@ -166,7 +185,8 @@ PravKal/
 - [x] Navigation: ↑/↓ scroll within month, F3 change date
 - [x] Movable feasts: Pascha, Holy Week, Pentecost, all derived feasts
 - [x] Heortology viewer: F5 opens .KAL texts
-- [x] Print to stdout: F7
+- [x] Export month to TXT: F7 → `mesec_YYYY_MM.txt`
+- [x] Export fasting schedule to TXT: F8 → `postovi_YYYY.txt`
 - [x] About dialog: F10 → Desk → Program...
 - [x] Fasting table: F10 → Opcije → Postovi
 - [x] Indiction table: F10 → Opcije → Indiktion
@@ -175,8 +195,6 @@ PravKal/
 ## Known Issues / Not Implemented
 
 - [ ] **Search (Traganje menu)**: all four search items (date, feast, fast, Sunday) are wired in the menu but have no implementation — stubs only
-- [ ] **Print to printer**: F7 writes to stdout; actual printer/file output not implemented
-- [ ] **Print fasting table (F8)**: no implementation
 - [ ] **Configuration (Konfiguracija)**: menu item present, no implementation
 - [ ] **Save configuration**: menu item present, no implementation
 - [ ] **Help (F1)**: shows in strip, no dialog implemented
@@ -197,6 +215,35 @@ cycle). Julian Easter 1941 = April 7 Julian = April 20 Gregorian. ✓
 
 **Byzantine year** (shown in info panel): approximately Gregorian year + 5508,
 adjusted September for the ecclesiastical New Year.
+
+---
+
+## Related Projects
+
+**PravKal** is the original DOS-era Serbian calendar, preserved and ported for
+modern terminals. For a full-featured, multi-tradition web application that
+continues this work, see:
+
+### [orthodox-calendar](https://github.com/nikolareljin/orthodox-calendar)
+
+> Orthodox and Oriental Orthodox saints, name-days, liturgical readings, moon
+> phases, and ICS feeds — FastAPI · React · 17 traditions · GitHub Pages
+
+The `orthodox-calendar` project is the modern successor: it covers 17 Orthodox
+and Oriental Orthodox traditions (Serbian, Greek, Russian, Coptic, Ethiopian,
+Armenian, …), exposes a REST API, generates iCal feeds, and includes a React
+frontend deployed to GitHub Pages. The calendar engine concepts in PravKal —
+the Alexandrian Paschalion, Julian date conversion, movable feast offsets —
+are all present in expanded form there.
+
+| | PravKal | orthodox-calendar |
+|---|---|---|
+| Interface | TUI (80×25 terminal) | Web (React + FastAPI) |
+| Traditions | Serbian Orthodox Church | 17 traditions |
+| Language | Free Pascal | Python + TypeScript |
+| Output | Terminal / TXT export | Browser / REST API / ICS |
+| Paschalion | ✓ (Meeus algorithm) | ✓ (expanded) |
+| Hagiography | Limited (6 .KAL texts) | 1100+ saints |
 
 ---
 
