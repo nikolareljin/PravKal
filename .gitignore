@@ -11,6 +11,8 @@ PPas*.sh
 # Compiled binary
 pravkal
 pravkal.exe
+pravkal6
+pravkal6.exe
 
 # Data files copied to project root by build.sh (canonical copies are in data/)
 /_PRAZ1.KAL
