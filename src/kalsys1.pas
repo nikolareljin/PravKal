@@ -127,10 +127,11 @@ begin
 end;
 
 { ── Color theme switcher ────────────────────────────────────────────── }
-{ Replaces the high nibble (background) of all co[] entries.
-  Theme 0 (Plava): blue bg ($1x) — default DOS look.
-  Theme 1 (Zelena): green bg ($2x).
-  Theme 2 (CrnoBela): black bg ($0x), high-contrast. }
+{ Apply a color theme.
+  t=0 (Plava):    full restore via setconstcol — resets both fg and bg.
+  t=1 (Zelena):   replaces background nibble of every co[] entry with $20.
+  t=2 (CrnoBela): replaces background nibble with $00, high-contrast.
+  Out-of-range values are silently treated as t=0. }
 procedure applyTheme(t: integer);
 var bg: byte;
     i : integer;

@@ -436,14 +436,14 @@ begin
   elwritecol(X1+2, Y1+2,  'Pravoslavni kalendar v6 - pregled funkcija:', co[15]);
   elwritecol(X1+2, Y1+4,  '1. KALENDAR (glavna strana)', co[4]);
   elwritecol(X1+4, Y1+5,  'Mesecni prikaz pravoslavnih praznika.', co[17]);
-  elwritecol(X1+4, Y1+6,  'G = Gregorijanski dan, J = Julijanski dan, boja = rang praznika.', co[17]);
+  elwritecol(X1+4, Y1+6,  'G = Gregorij. dan, J = Julij. dan; boja = rang praznika.', co[17]);
   elwritecol(X1+2, Y1+8,  '2. OPCIJE (meni, F3/F5/Ctrl-P)', co[4]);
   elwritecol(X1+4, Y1+9,  'Promena datuma, tabela postova, heortologija, indiktion.', co[17]);
   elwritecol(X1+2, Y1+11, '3. TRAGANJE (meni)', co[4]);
   elwritecol(X1+4, Y1+12, 'Pretraga po datumu, prazniku, postu ili liturgijskoj nedelji.', co[17]);
   elwritecol(X1+2, Y1+14, '4. STAMPANJE (F7 / F8)', co[4]);
   elwritecol(X1+4, Y1+15, 'Stampanje mesecnog kalendara ili tabele postova.', co[17]);
-  elwritecol(X1+2, Y1+17, 'Napomena: svi datumi praznika su po Julijanskom (starom) kalendaru.', co[6]);
+  elwritecol(X1+2, Y1+17, 'Napomena: datumi su po julijanskom (starom) kalendaru.', co[6]);
   waitKey(' Pritisnite bilo koji taster... ');
 end;
 
@@ -508,8 +508,18 @@ begin
     waitKey(' Taster za nastavak... ');
     exit;
   end;
+  {$I-}
   WriteLn(f, 'theme=' + strf(colorTheme));
   Close(f);
+  {$I+}
+  if IOResult <> 0 then
+  begin
+    openwind(15, 11, 65, 14, co[27], co[27], ' Greska ', 0,
+             false, false, false, false, wsingle, 0, 0, true, false, 0);
+    elwritecol(17, 12, 'Greska pri pisanju: ' + fname, co[6]);
+    waitKey(' Taster za nastavak... ');
+    exit;
+  end;
   openwind(15, 11, 65, 14, co[27], co[27], ' Konfiguracija snimljena ', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
   elwritecol(17, 12, 'Snimljeno: ' + fname, co[4]);
@@ -531,6 +541,7 @@ begin
   Reset(f);
   {$I+}
   if IOResult <> 0 then exit;
+  {$I-}
   while not EOF(f) do
   begin
     ReadLn(f, line);
@@ -545,6 +556,7 @@ begin
     end;
   end;
   Close(f);
+  {$I+}
 end;
 
 begin
