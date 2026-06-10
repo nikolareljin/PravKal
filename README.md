@@ -9,21 +9,28 @@ Turbo Pascal 6/7 program to Free Pascal (FPC) for Linux, Windows, and macOS.
 
 ---
 
-## О програму / About (српски)
+## О програму / About
+
+**PravKal** is a TUI (terminal) Orthodox calendar for the Serbian Orthodox Church.
+It displays parallel Gregorian and Julian dates, fixed and movable feasts, fasting
+days, and the Byzantine year. It is a port of the original DOS program written in
+Turbo Pascal — adapted for modern systems (Linux, Windows, macOS) using the
+Free Pascal compiler.
 
 **PravKal** је текстуални (TUI) православни календар за Српску Православну Цркву.
-Прикaзује паралелне григоријанске и јулијанске датуме, покретне и непокретне
+Приказује паралелне григоријанске и јулијанске датуме, покретне и непокретне
 празнике, дане поста и византијску годину. Програм је порт оригиналног DOS
 програма написаног у Turbo Pascal-у — прилагођен за рад на савременим
 системима (Linux, Windows, macOS) уз помоћ Free Pascal компилатора.
 
-Функције:
-- Приказ месечног календара са јулијанским датумима
-- Пасхалион: израчунавање датума Васкрса по 532-годишњем циклусу
-- Означавање дана поста (`*`)
-- Извоз месечног календара и табеле постова у TXT фајл (F7 / F8)
-- Хеортологија: текстови за велике празнике (F5)
-- Byzantијска година и индикт
+| English | Српски |
+|---------|--------|
+| Monthly calendar view with Julian dates | Приказ месечног календара са јулијанским датумима |
+| Paschalion: Easter date computed over 532-year cycle | Пасхалион: израчунавање датума Васкрса по 532-годишњем циклусу |
+| Fasting-day markers (`*`) | Означавање дана поста (`*`) |
+| Export month and fasting schedule to TXT (F7 / F8) | Извоз месечног календара и табеле постова у TXT фајл (F7 / F8) |
+| Heortology: feast-day texts (F5) | Хеортологија: текстови за велике празнике (F5) |
+| Byzantine year and Indiction | Византијска година и индикт |
 
 ---
 
