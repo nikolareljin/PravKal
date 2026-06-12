@@ -2,6 +2,36 @@
 
 All notable changes to this project are documented here.
 
+## [0.2.1] — 2026-06-12
+
+### Fixed
+- CI: release workflow now resolves correctly against the `production` ref
+
+## [0.2.0] — 2026-06-10
+
+### Added
+- F7 exports current month to `mesec_YYYY_MM.txt` (plain-text layout)
+- F8 exports the annual fasting schedule to `postovi_YYYY.txt`
+- `-h` / `--help` CLI flag prints usage and exits
+- `-v` / `--version` CLI flag prints version and exits
+- Help (Pomoc) and Configuration (Konfiguracija) stub menu items under Pomoc menu
+- Bilingual About dialog (Serbian + English)
+- Original authorship year 1993 shown in About dialog
+
+### Fixed
+- Correct column alignment in TXT month export (off-by-one spacing)
+- Calendar screen fully restored after closing any menu (no ghost content)
+
+### Changed
+- Project renamed from KalendarFPC to **PravKal**
+- Binary renamed to `pravkal`
+
+### Known limitations (carry-forward)
+- Search (Traganje) menu items: wired but no implementation
+- Print to actual printer/file: stdout only
+- Configuration dialogs: not implemented
+- Help system: not implemented
+
 ## [0.1.0] — 2026-06-09
 
 ### Added
