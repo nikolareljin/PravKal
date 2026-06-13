@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Tag to build and release (e.g. 0.2.1)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -20,3 +26,4 @@ jobs:
       package_maintainer: "Nikola Reljin <nikolareljin@users.noreply.github.com>"
       package_description: "Serbian Orthodox liturgical calendar TUI (Free Pascal port of the original DOS PravKal)"
       package_url: "https://github.com/nikolareljin/PravKal"
+      release_tag: ${{ github.event.inputs.release_tag || github.ref_name }}
