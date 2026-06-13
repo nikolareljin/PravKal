@@ -26,4 +26,4 @@ jobs:
       package_maintainer: "Nikola Reljin <nikolareljin@users.noreply.github.com>"
       package_description: "Serbian Orthodox liturgical calendar TUI (Free Pascal port of the original DOS PravKal)"
       package_url: "https://github.com/nikolareljin/PravKal"
-      release_tag: ${{ inputs.release_tag }}
+      release_tag: ${{ github.event.inputs.release_tag || github.ref_name }}
