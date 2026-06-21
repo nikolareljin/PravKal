@@ -25,11 +25,17 @@ All notable changes to this project are documented here.
   DOS application; calendar grid uses correct tee/cross junctions
 - Heortologija prose data files (`data/_PRAZ1..6.KAL`, `_GRESKE.MOL`)
   translated to Cyrillic
-- String-type capacities widened (`prstr`, `tbstr`, menu/day arrays) to hold
-  the 2-bytes-per-letter UTF-8 Cyrillic without overflow
+- String-type capacities widened (`prstr`, `tbstr`, `da`, `kfun.sta`, theme
+  names) to hold the 2-bytes-per-letter UTF-8 Cyrillic without overflow
+- Day-of-week initials changed from a `char` array to a string array
+  (`Н П У С Ч П С`), since a Cyrillic glyph no longer fits in one byte
+- All layout math switched from `length()` (bytes) to `dlen()` (visible
+  columns) so grid, menus, and centered dialog titles stay aligned
 
 ### Notes
 - Requires a UTF-8 terminal (standard on modern Linux/macOS)
+- Search input still edits Cyrillic by UTF-8 byte rather than glyph (cosmetic;
+  matching works) — see README known limitations
 
 ## [0.2.1] — 2026-06-12
 
