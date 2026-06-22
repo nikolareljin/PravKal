@@ -89,9 +89,10 @@ strong { color: var(--dos-white); }
 }
 .cross {
   color: var(--dos-gold);
-  font-size: 20px; line-height: 1.1; margin: 0;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.55);
-  white-space: pre;
+  width: clamp(72px, 12vw, 132px);
+  height: auto;
+  margin: 0;
+  filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.6));
 }
 
 /* ── Buttons ─────────────────────────────────────────────────────── */
