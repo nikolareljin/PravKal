@@ -99,7 +99,9 @@ const
 
 procedure rawOut(const s: string);
 begin
-  if length(s) > 0 then FileWrite(1, s[1], length(s));
+  { StdOutputHandle is the real stdout handle on every platform; a hard-coded
+    1 only happens to match stdout on Unix and breaks the TUI on Windows. }
+  if length(s) > 0 then FileWrite(StdOutputHandle, s[1], length(s));
 end;
 
 procedure scrPut(const s: string);

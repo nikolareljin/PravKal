@@ -1188,7 +1188,9 @@ begin
     for d := 1 to brdmj(m, _g) do
     begin
       feast := imepraz(d, m, _g);
-      if Pos(UpperCase(query), UpperCase(copy(feast, 2, length(feast)))) > 0 then
+      { upcasestr folds Serbian Cyrillic too; SysUtils.UpperCase only folds
+        ASCII, so a lowercase query would miss Cyrillic-cased feast names }
+      if Pos(upcasestr(query), upcasestr(copy(feast, 2, length(feast)))) > 0 then
         if rcount < 50 then
         begin
           inc(rcount);

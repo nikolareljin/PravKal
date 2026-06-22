@@ -199,14 +199,13 @@ begin
   ok := false;
   repeat
     elwritecol(X1 + 2, Y1 + 2, 'Месец (1-12): ', co[4]);
-    setAttr(co[15]);
     Str(nm, buf);
-    Write(buf + '   ');
+    { keep all output on the UTF-8-safe scr* layer; mixing crt Write here
+      desyncs the cursor and corrupts the Cyrillic/box-glyph layout }
+    elwritecol(X1 + 16, Y1 + 2, buf + '   ', co[15]);
     elwritecol(X1 + 2, Y1 + 4, 'Година:       ', co[4]);
-    setAttr(co[15]);
     Str(ng, buf);
-    Write(buf + '     ');
-    NormVideo;
+    elwritecol(X1 + 16, Y1 + 4, buf + '     ', co[15]);
     elwritecol(X1 + 2, Y1 + 6, 'Enter=потврди  Esc=одустани', co[17]);
     elwritecol(X1 + 2, Y1 + 7, 'PgUp/PgDn месец,  +/- година', co[17]);
     k := ReadKey;
