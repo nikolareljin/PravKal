@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## [1.0.2] — 2026-06-22
+
+### Fixed
+- Windows release build: `build.sh` now names the compiler output
+  `pravkal.exe` on Windows (FPC's `-o` without an extension could emit a bare
+  `pravkal`, which the release pipeline's verify step couldn't find). The
+  Windows job now publishes a standalone `pravkal-<tag>-windows-x86_64.exe`
+  and a `.zip` (exe + data) alongside the Linux and macOS artifacts.
+
 ## [1.0.1] — 2026-06-22
 
 ### Fixed
