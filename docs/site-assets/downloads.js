@@ -9,11 +9,10 @@
   var api = "https://api.github.com/repos/" + repo + "/releases/latest";
 
   // Match an asset filename to a button key. Keys are arch-specific so an
-  // asset is never wired to the wrong button. The ci-helpers release
-  // workflow names assets:
-  //   pravkal-<tag>-{linux-x86_64,macos-arm64}.{tar.gz,dmg,deb,rpm,AppImage}
+  // Intel asset is never wired to an Apple-Silicon button (and vice versa).
+  // The ci-helpers release workflow names assets:
+  //   pravkal-<tag>-{linux-x86_64,macos-arm64,macos-x86_64}.{tar.gz,dmg,deb,rpm,AppImage}
   //   pravkal-<tag>-windows-x86_64.zip   (a zip, NOT a bare .exe)
-  // (macOS is arm64-only; the Intel/macos-13 build was dropped upstream.)
   function classify(name) {
     var n = name.toLowerCase();
     if (n.endsWith(".deb")) return "deb";
@@ -21,7 +20,9 @@
     if (n.endsWith(".appimage")) return "appimage";
     if (n.indexOf("windows") !== -1 && n.endsWith(".zip")) return "win";
     if (n.indexOf("macos-arm64") !== -1 && n.endsWith(".dmg")) return "dmg-arm64";
+    if (n.indexOf("macos-x86_64") !== -1 && n.endsWith(".dmg")) return "dmg-x64";
     if (n.indexOf("macos-arm64") !== -1 && n.endsWith(".tar.gz")) return "mac-tar-arm64";
+    if (n.indexOf("macos-x86_64") !== -1 && n.endsWith(".tar.gz")) return "mac-tar-x64";
     if (n.indexOf("linux") !== -1 && n.endsWith(".tar.gz")) return "linux-tar";
     return null;
   }
