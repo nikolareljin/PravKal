@@ -4,7 +4,7 @@ program pravkal;
 uses crt, SysUtils, nizz, kalsys1, kalmenu1, kalwork1, kaltxt;
 
 const
-  VERSION = '1.0.0';
+  VERSION = '1.0.1';
 
 procedure showHelp;
 begin
@@ -854,12 +854,18 @@ begin
       'b': writenedelja(_dj2_, _mj2_, iop);
       'c': elwritecol(2, iop, dnd, co[2]);
     else
+      if vv < _k then
       begin
         inc(vv);
         writedat(vv, iop, _dj2_, _mj2_, _gj2_, d_d);
         inc(d_d); if d_d = 7 then d_d := 0;
         uvecjul(_dj2_, _mj2_, _gj2_);
-      end;
+      end
+      else
+        { Past the last day of the month: emit a blank interior row instead of
+          numbering phantom days (e.g. a spurious 32nd day in a 31-day month).
+          _k = brmdg(_m, _g) is the real day count. }
+        elwritecol(2, iop, BOX_V + niz(60, ' ') + BOX_V, co[2]);
     end;
   end;
   if tabs[mt___ + 16] in ['a', 'b'] then

@@ -1,0 +1,120 @@
+name: Windows EXE
+
+# Builds a standalone pravkal.exe on Windows and attaches it to a release.
+# Self-contained: does not depend on the shared ci-helpers release workflow,
+# so a real .exe is available regardless of that pipeline's state.
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to build and attach the .exe to (e.g. 1.0.0)'
+        required: true
+        type: string
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  windows-exe:
+    name: Build pravkal.exe (windows-x86_64)
+    runs-on: windows-latest
+    steps:
+      - name: Resolve tag
+        id: tag
+        shell: bash
+        env:
+          INPUT_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          tag="${INPUT_TAG:-${GITHUB_REF_NAME}}"
+          tag="${tag//$'\r'/}"
+          tag="${tag//$'\n'/}"
+          if ! echo "$tag" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Resolved tag '${tag}' is not a semver."
+            exit 1
+          fi
+          printf 'tag=%s\n' "$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install FPC + generate fpc.cfg
+        shell: pwsh
+        run: |
+          choco install freepascal -y --no-progress
+          # Chocolatey updates the Machine PATH in the registry but the current
+          # process doesn't inherit it; merge it in without dropping runner tools.
+          $machinePath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
+          $userPath    = [System.Environment]::GetEnvironmentVariable('Path', 'User')
+          $env:PATH    = "$env:PATH;$machinePath;$userPath"
+          $fpc = Get-Command fpc -ErrorAction SilentlyContinue
+          if (-not $fpc) {
+            $roots = @('C:\fpc', 'C:\tools\freepascal', 'C:\ProgramData\chocolatey\lib')
+            $hit = $roots | ForEach-Object {
+              Get-ChildItem $_ -Recurse -Depth 6 -Filter 'fpc.exe' -ErrorAction SilentlyContinue
+            } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+            if (-not $hit) { Write-Error 'fpc.exe not found after choco install'; exit 1 }
+            $fpcBin = $hit.DirectoryName
+          } else {
+            $fpcBin = Split-Path $fpc.Source
+          }
+          $fpcBin | Add-Content -Path $env:GITHUB_PATH
+          # The Chocolatey freepascal package ships no fpc.cfg, so the fpc driver
+          # has no RTL unit search paths and aborts with "Can't find unit crt".
+          # Resolve the FPC root by walking up to a 'units' directory (the
+          # Windows RTL layout — there is no Unix-style lib\fpc), then generate a
+          # default fpc.cfg with fpcmkcfg so RTL units resolve.
+          $p = $fpcBin
+          $root = $null
+          for ($i = 0; $i -lt 6; $i++) {
+            if (Test-Path (Join-Path $p 'units')) { $root = $p; break }
+            $parent = Split-Path $p -Parent
+            if (-not $parent -or $parent -eq $p) { break }
+            $p = $parent
+          }
+          if (-not $root) { Write-Error "FPC 'units' root not found above $fpcBin"; exit 1 }
+          "FPCDIR=$root" | Add-Content -Path $env:GITHUB_ENV
+          $mkcfg = Join-Path $fpcBin 'fpcmkcfg.exe'
+          if (-not (Test-Path $mkcfg)) {
+            $c = Get-Command fpcmkcfg -ErrorAction SilentlyContinue
+            if ($c) { $mkcfg = $c.Source }
+          }
+          if (Test-Path $mkcfg) {
+            & $mkcfg -d "basepath=$root" -o (Join-Path $fpcBin 'fpc.cfg')
+            Write-Output "Generated fpc.cfg (basepath=$root)"
+          } else {
+            Write-Error 'fpcmkcfg not found; cannot generate fpc.cfg'; exit 1
+          }
+
+      - name: Build
+        shell: bash
+        run: bash build.sh
+
+      - name: Stage exe
+        id: stage
+        shell: bash
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          # build.sh places the binary at the repo root; FPC adds .exe on Windows.
+          if [ ! -f pravkal.exe ]; then
+            echo "::error::pravkal.exe not found after build"; ls -la; exit 1
+          fi
+          asset="pravkal-${TAG}-windows-x86_64.exe"
+          cp pravkal.exe "$asset"
+          printf 'asset=%s\n' "$asset" >> "$GITHUB_OUTPUT"
+
+      - name: Upload exe to release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+          ASSET: ${{ steps.stage.outputs.asset }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" "$ASSET" --clobber --repo "$GITHUB_REPOSITORY"
