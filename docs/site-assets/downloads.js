@@ -61,7 +61,8 @@
       });
 
       var buttons = document.querySelectorAll(".btn.dl[data-asset]");
-      buttons.forEach(function (btn) {
+      for (var i = 0; i < buttons.length; i++) {
+        var btn = buttons[i];
         var key = btn.getAttribute("data-asset");
         var asset = byKey[key];
         var meta = btn.querySelector(".dl-meta");
@@ -74,7 +75,7 @@
           btn.classList.add("pending");
           if (meta) meta.textContent = "(pending)";
         }
-      });
+      }
 
       // Hide the Windows "build pending" note once a real asset exists.
       var winNote = document.getElementById("winNote");
