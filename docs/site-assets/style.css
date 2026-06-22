@@ -201,5 +201,6 @@ body.crt-on  { text-shadow: 0 0 2px rgba(150,180,255,0.45); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .btn { transition: none; }
+  .btn,
+  .crt-overlay { transition: none; }
 }
