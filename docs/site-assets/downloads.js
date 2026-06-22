@@ -34,6 +34,20 @@
     return "(" + Math.max(1, Math.round(bytes / 1024)) + " KB)";
   }
 
+  function fallbackLabel() {
+    // Show a sensible label instead of the "…" placeholder when we can't reach
+    // the API; the static per-button links already point at the releases page.
+    var ver = document.getElementById("relVersion");
+    if (ver && ver.textContent === "…") ver.textContent = "latest";
+  }
+
+  // Feature-detect fetch: on old browsers / some webviews it's absent, and
+  // calling it would throw before the .catch handler runs. Fall back cleanly.
+  if (typeof window.fetch !== "function") {
+    fallbackLabel();
+    return;
+  }
+
   fetch(api, { headers: { Accept: "application/vnd.github+json" } })
     .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
     .then(function (rel) {
@@ -67,6 +81,8 @@
       if (winNote && byKey.win) winNote.style.display = "none";
     })
     .catch(function () {
-      /* keep static fallback links; nothing else to do */
+      // API unreachable (offline / rate-limited): keep the static fallback
+      // links and replace the "…" placeholder so the page doesn't look broken.
+      fallbackLabel();
     });
 })();
