@@ -2,6 +2,7 @@
 (function () {
   var body = document.body;
   var btn = document.getElementById("crtToggle");
+  if (!body || !btn) return;
   var KEY = "pravkal-crt";
 
   function apply(on) {
