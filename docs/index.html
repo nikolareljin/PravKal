@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Православни календар · PravKal — Српска Православна Црква</title>
+<meta name="description" content="PravKal — DOS-era Serbian Orthodox liturgical calendar (Православни календар Српске Православне Цркве), preserved and ported to modern terminals. Downloads for Linux, macOS, and Windows.">
+<meta property="og:title" content="Православни календар · PravKal">
+<meta property="og:description" content="DOS-era Serbian Orthodox calendar, preserved for modern terminals. Now in Serbian Cyrillic with Unicode borders.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site-assets/style.css">
+</head>
+<body data-repo="nikolareljin/PravKal">
+
+<div class="crt-overlay" id="crtOverlay" aria-hidden="true"></div>
+
+<button class="crt-toggle" id="crtToggle" type="button" aria-pressed="true"
+        title="Toggle CRT effect">CRT: ON</button>
+
+<div class="screen">
+
+  <!-- ── Hero ──────────────────────────────────────────────────── -->
+  <header class="hero panel">
+    <div class="panel-title">PravKal · v1.0.0</div>
+    <div class="hero-grid">
+      <div class="hero-text">
+        <h1 class="title">Православни календар</h1>
+        <p class="subtitle">Српска Православна Црква</p>
+        <p class="tagline">
+          The original DOS-era Serbian Orthodox liturgical calendar —
+          preserved, ported to Free Pascal, and running in any modern
+          UTF-8 terminal.
+        </p>
+        <div class="btn-row">
+          <a class="btn btn-gold" href="#download">▼ Преузми / Download</a>
+          <a class="btn" href="https://github.com/nikolareljin/PravKal"
+             target="_blank" rel="noopener">⌂ GitHub</a>
+          <a class="btn btn-cyan" href="#successor">→ orthodox-calendar</a>
+        </div>
+      </div>
+      <pre class="cross" aria-hidden="true">
+       †
+      ╱│╲
+       │
+   ┄┄┄─┼─┄┄┄
+       │
+      ╱│╲
+       │
+     ╱─┴─╲
+      </pre>
+    </div>
+  </header>
+
+  <!-- ── Before / Now ──────────────────────────────────────────── -->
+  <section class="panel" id="story">
+    <div class="panel-title">Пре · Сада  /  Before · Now</div>
+    <p class="lede">
+      Version <strong>1.0.0</strong> is a ground-up presentation upgrade.
+      The UI was fully converted from ASCII Serbian Latin to
+      <strong class="gold">Serbian Cyrillic</strong>, the ASCII
+      <code>+ - |</code> art was replaced with proper
+      <strong class="gold">Unicode box-drawing</strong> borders, and a
+      UTF-8-safe raw-ANSI screen layer was added so multi-byte glyphs no
+      longer break the 80×25 layout.
+    </p>
+    <div class="compare">
+      <figure class="frame">
+        <figcaption class="frame-cap">ПРЕ · Before — ASCII Latin, <code>+ - |</code> borders</figcaption>
+        <img loading="lazy" src="screenshots/before/01_main.png"
+             alt="PravKal before: Serbian Latin UI with ASCII borders">
+      </figure>
+      <figure class="frame">
+        <figcaption class="frame-cap">САДА · Now — Cyrillic, Unicode borders</figcaption>
+        <img loading="lazy" src="screenshots/01_main.png"
+             alt="PravKal now: Serbian Cyrillic UI with Unicode box-drawing borders">
+      </figure>
+    </div>
+  </section>
+
+  <!-- ── Gallery ───────────────────────────────────────────────── -->
+  <section class="panel" id="gallery">
+    <div class="panel-title">Галерија · Gallery</div>
+    <div class="gallery">
+      <figure class="frame">
+        <img loading="lazy" src="screenshots/01_main.png" alt="Main calendar view, June 2026">
+        <figcaption class="frame-cap">Главни приказ — June 2026</figcaption>
+      </figure>
+      <figure class="frame">
+        <img loading="lazy" src="screenshots/02_scrolled.png" alt="Scrolled week window">
+        <figcaption class="frame-cap">Скроловање — weeks 2–3</figcaption>
+      </figure>
+      <figure class="frame">
+        <img loading="lazy" src="screenshots/03_date_dialog.png" alt="F3 date change dialog">
+        <figcaption class="frame-cap">Промена датума (F3)</figcaption>
+      </figure>
+      <figure class="frame">
+        <img loading="lazy" src="screenshots/04_heortology.png" alt="F5 heortology text list">
+        <figcaption class="frame-cap">Хеортологија (F5)</figcaption>
+      </figure>
+      <figure class="frame">
+        <img loading="lazy" src="screenshots/05_menu.png" alt="F10 Options drop-down menu">
+        <figcaption class="frame-cap">Мени · Опције (F10)</figcaption>
+      </figure>
+      <figure class="frame">
+        <img loading="lazy" src="screenshots/06_january.png" alt="January view, Christmas and Nativity Fast">
+        <figcaption class="frame-cap">Јануар — Божић &amp; Божићни пост</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ── Downloads ─────────────────────────────────────────────── -->
+  <section class="panel" id="download">
+    <div class="panel-title">Преузимање · Downloads</div>
+    <p class="lede">
+      Latest release: <strong id="relVersion" class="gold">…</strong>
+      <a id="relAll" href="https://github.com/nikolareljin/PravKal/releases/latest"
+         target="_blank" rel="noopener">(all releases &amp; checksums)</a>
+    </p>
+
+    <div class="downloads">
+      <div class="dl-os">
+        <h3 class="gold">🐧 Linux</h3>
+        <a class="btn dl" data-asset="deb"      href="https://github.com/nikolareljin/PravKal/releases/latest">.deb <span class="dl-meta"></span></a>
+        <a class="btn dl" data-asset="rpm"      href="https://github.com/nikolareljin/PravKal/releases/latest">.rpm <span class="dl-meta"></span></a>
+        <a class="btn dl" data-asset="appimage" href="https://github.com/nikolareljin/PravKal/releases/latest">.AppImage <span class="dl-meta"></span></a>
+        <a class="btn dl" data-asset="linux-tar" href="https://github.com/nikolareljin/PravKal/releases/latest">.tar.gz <span class="dl-meta"></span></a>
+      </div>
+      <div class="dl-os">
+        <h3 class="gold"> macOS</h3>
+        <a class="btn dl" data-asset="dmg"       href="https://github.com/nikolareljin/PravKal/releases/latest">.dmg <span class="dl-meta"></span></a>
+        <a class="btn dl" data-asset="macos-tar" href="https://github.com/nikolareljin/PravKal/releases/latest">.tar.gz <span class="dl-meta"></span></a>
+        <p class="note">Apple Silicon (arm64)</p>
+      </div>
+      <div class="dl-os">
+        <h3 class="gold">🪟 Windows</h3>
+        <a class="btn dl" data-asset="exe" href="https://github.com/nikolareljin/PravKal/releases/latest">.exe <span class="dl-meta"></span></a>
+        <p class="note" id="winNote">build pending — <a href="https://github.com/nikolareljin/PravKal/releases/latest" target="_blank" rel="noopener">check releases</a></p>
+      </div>
+    </div>
+    <p class="note">
+      Requires a UTF-8 terminal (standard on modern Linux/macOS). Run
+      <code>pravkal</code>; press <code>F1</code> for help.
+    </p>
+  </section>
+
+  <!-- ── Modern successor ──────────────────────────────────────── -->
+  <section class="panel" id="successor">
+    <div class="panel-title">Модерни наследник · Modern successor</div>
+    <div class="successor">
+      <div class="successor-text">
+        <h3 class="cyan">orthodox-calendar</h3>
+        <p>
+          PravKal's modern successor: a full multi-tradition web application.
+          Orthodox and Oriental Orthodox saints, name-days, liturgical
+          readings, moon phases, and ICS feeds — <strong>FastAPI · React ·
+          17 traditions · GitHub Pages</strong>. The calendar-engine concepts
+          here (Alexandrian Paschalion, Julian conversion, movable-feast
+          offsets) live on in expanded form.
+        </p>
+        <a class="btn btn-cyan"
+           href="https://github.com/nikolareljin/orthodox-calendar"
+           target="_blank" rel="noopener">→ Visit orthodox-calendar</a>
+      </div>
+      <table class="cmp">
+        <thead><tr><th></th><th>PravKal</th><th>orthodox-calendar</th></tr></thead>
+        <tbody>
+          <tr><td>Interface</td><td>TUI (80×25)</td><td>Web (React + FastAPI)</td></tr>
+          <tr><td>Traditions</td><td>Serbian Orthodox</td><td>17 traditions</td></tr>
+          <tr><td>Language</td><td>Free Pascal</td><td>Python + TypeScript</td></tr>
+          <tr><td>Output</td><td>Terminal / TXT</td><td>Browser / REST / ICS</td></tr>
+          <tr><td>Paschalion</td><td>✓ (Meeus)</td><td>✓ (expanded)</td></tr>
+          <tr><td>Hagiography</td><td>6 .KAL texts</td><td>1100+ saints</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Footer ────────────────────────────────────────────────── -->
+  <footer class="panel footer">
+    <div class="panel-title">≡</div>
+    <p>
+      <a href="https://github.com/nikolareljin/PravKal" target="_blank" rel="noopener">PravKal on GitHub</a> ·
+      <a href="https://github.com/nikolareljin/PravKal/releases" target="_blank" rel="noopener">Releases</a> ·
+      <a href="https://github.com/nikolareljin/PravKal/blob/main/LICENSE" target="_blank" rel="noopener">License</a> ·
+      <a href="https://github.com/nikolareljin/orthodox-calendar" target="_blank" rel="noopener">orthodox-calendar</a>
+    </p>
+    <p class="gold">☦ Слава Богу за све ☦</p>
+  </footer>
+
+</div>
+
+<script src="site-assets/crt.js"></script>
+<script src="site-assets/downloads.js"></script>
+</body>
+</html>

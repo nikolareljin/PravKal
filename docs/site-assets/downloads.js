@@ -1,0 +1,66 @@
+/* Always-latest downloads.
+   Release asset names embed the version (e.g. pravkal-1.0.0-linux-x86_64.AppImage),
+   so a static /releases/latest/download/<name> link breaks on every version bump.
+   Instead we query the GitHub API for the latest release and wire each per-OS
+   button to the real asset. If the API is unreachable (offline, rate-limited),
+   the static fallback hrefs (the releases page) remain. */
+(function () {
+  var repo = document.body.getAttribute("data-repo") || "nikolareljin/PravKal";
+  var api = "https://api.github.com/repos/" + repo + "/releases/latest";
+
+  // Match an asset filename to a button key. Order matters: test tar.gz per-OS.
+  function classify(name) {
+    var n = name.toLowerCase();
+    if (n.endsWith(".deb")) return "deb";
+    if (n.endsWith(".rpm")) return "rpm";
+    if (n.endsWith(".appimage")) return "appimage";
+    if (n.endsWith(".exe")) return "exe";
+    if (n.endsWith(".dmg")) return "dmg";
+    if (n.indexOf("macos") !== -1 && n.endsWith(".tar.gz")) return "macos-tar";
+    if (n.indexOf("linux") !== -1 && n.endsWith(".tar.gz")) return "linux-tar";
+    return null;
+  }
+
+  function human(bytes) {
+    if (!bytes && bytes !== 0) return "";
+    var mb = bytes / (1024 * 1024);
+    if (mb >= 1) return "(" + mb.toFixed(1) + " MB)";
+    return "(" + Math.max(1, Math.round(bytes / 1024)) + " KB)";
+  }
+
+  fetch(api, { headers: { Accept: "application/vnd.github+json" } })
+    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function (rel) {
+      var ver = document.getElementById("relVersion");
+      if (ver) ver.textContent = rel.tag_name || rel.name || "latest";
+
+      var byKey = {};
+      (rel.assets || []).forEach(function (a) {
+        var k = classify(a.name);
+        if (k && !byKey[k]) byKey[k] = a;
+      });
+
+      var buttons = document.querySelectorAll(".btn.dl[data-asset]");
+      buttons.forEach(function (btn) {
+        var key = btn.getAttribute("data-asset");
+        var asset = byKey[key];
+        var meta = btn.querySelector(".dl-meta");
+        if (asset) {
+          btn.href = asset.browser_download_url;
+          if (meta) meta.textContent = human(asset.size);
+          btn.classList.remove("pending");
+        } else {
+          // No such asset in the latest release — mark pending, keep releases-page href.
+          btn.classList.add("pending");
+          if (meta) meta.textContent = "(pending)";
+        }
+      });
+
+      // Hide the Windows "build pending" note once a real .exe exists.
+      var winNote = document.getElementById("winNote");
+      if (winNote && byKey.exe) winNote.style.display = "none";
+    })
+    .catch(function () {
+      /* keep static fallback links; nothing else to do */
+    });
+})();

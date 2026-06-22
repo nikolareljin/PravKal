@@ -1,0 +1,205 @@
+/* PravKal landing page — DOS/CGA aesthetic
+   Palette mirrors the running app: blue field, gold/cyan/red accents. */
+
+:root {
+  --dos-blue:   #0000aa;   /* app background */
+  --dos-blue-d: #000088;   /* darker panel interior */
+  --dos-cyan:   #55ffff;
+  --dos-gold:   #ffd700;
+  --dos-white:  #e8e8f0;
+  --dos-red:    #ff5555;
+  --dos-grey:   #8a8ac0;
+  --border:     #aab0ff;   /* box-drawing border colour */
+}
+
+* { box-sizing: border-box; }
+
+html { background: #000; }
+
+body {
+  margin: 0;
+  padding: 24px 14px 56px;
+  background:
+    radial-gradient(ellipse at 50% 0%, #0a0ac8 0%, var(--dos-blue) 55%, #00006e 100%);
+  color: var(--dos-white);
+  font-family: "VT323", "DejaVu Sans Mono", "Cascadia Mono", Consolas, monospace;
+  font-size: 22px;
+  line-height: 1.35;
+  letter-spacing: 0.3px;
+  text-shadow: 0 0 1px rgba(170, 200, 255, 0.35);
+  min-height: 100vh;
+}
+
+.screen {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+/* ── Panels: framed like the app's windows ───────────────────────── */
+.panel {
+  position: relative;
+  background: linear-gradient(180deg, var(--dos-blue) 0%, var(--dos-blue-d) 100%);
+  border: 3px solid var(--border);
+  border-radius: 2px;
+  padding: 26px 22px 22px;
+  box-shadow: 0 0 0 1px #000 inset, 0 6px 22px rgba(0,0,0,0.45);
+}
+.panel-title {
+  position: absolute;
+  top: -15px; left: 18px;
+  padding: 0 10px;
+  background: var(--dos-blue);
+  color: var(--dos-cyan);
+  font-size: 21px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+/* ── Typography ──────────────────────────────────────────────────── */
+h1, h2, h3 { margin: 0 0 8px; font-weight: normal; }
+.title {
+  font-size: clamp(40px, 8vw, 74px);
+  color: var(--dos-gold);
+  line-height: 1.05;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+.subtitle { font-size: clamp(22px, 4vw, 32px); color: var(--dos-white); margin: 0 0 14px; }
+.tagline  { color: var(--dos-grey); max-width: 46ch; }
+.lede     { max-width: 70ch; }
+.gold { color: var(--dos-gold); }
+.cyan { color: var(--dos-cyan); }
+code {
+  background: #000a55;
+  border: 1px solid #2a2aaa;
+  padding: 0 5px; border-radius: 2px;
+  color: var(--dos-cyan);
+}
+a { color: var(--dos-cyan); text-decoration: none; }
+a:hover { text-decoration: underline; color: #aaffff; }
+strong { color: var(--dos-white); }
+
+/* ── Hero ────────────────────────────────────────────────────────── */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px; align-items: center;
+}
+.cross {
+  color: var(--dos-gold);
+  font-size: 20px; line-height: 1.1; margin: 0;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.55);
+  white-space: pre;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+.btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.btn {
+  display: inline-block;
+  padding: 6px 16px;
+  border: 2px solid var(--border);
+  background: #000a66;
+  color: var(--dos-white);
+  border-radius: 2px;
+  transition: background .12s, transform .06s, box-shadow .12s;
+}
+.btn:hover {
+  background: #1414aa; text-decoration: none;
+  box-shadow: 0 0 10px rgba(120,150,255,0.5);
+}
+.btn:active { transform: translateY(1px); }
+.btn-gold { border-color: var(--dos-gold); color: var(--dos-gold); }
+.btn-gold:hover { background: #3a3000; color: #fff0a0; }
+.btn-cyan { border-color: var(--dos-cyan); color: var(--dos-cyan); }
+.btn-cyan:hover { background: #003a3a; color: #aaffff; }
+
+/* ── Before / Now + Gallery frames ──────────────────────────────── */
+.compare, .gallery {
+  display: grid; gap: 18px; margin-top: 16px;
+}
+.compare { grid-template-columns: 1fr 1fr; }
+.gallery { grid-template-columns: repeat(2, 1fr); }
+.frame {
+  margin: 0;
+  border: 2px solid var(--border);
+  background: #000a4d;
+  padding: 8px;
+  border-radius: 2px;
+}
+.frame img {
+  display: block; width: 100%; height: auto;
+  border: 1px solid #000; image-rendering: auto;
+}
+.frame-cap {
+  color: var(--dos-cyan);
+  font-size: 18px; padding: 7px 4px 2px; text-align: center;
+}
+
+/* ── Downloads ───────────────────────────────────────────────────── */
+.downloads {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 18px; margin: 18px 0 10px;
+}
+.dl-os { border: 2px dashed #3a3aaa; padding: 14px; border-radius: 2px; }
+.dl-os h3 { font-size: 24px; }
+.btn.dl { display: block; margin: 8px 0; }
+.dl-meta { color: var(--dos-grey); font-size: 16px; }
+.note { color: var(--dos-grey); font-size: 17px; margin: 8px 0 0; }
+.dl.pending { border-style: dashed; opacity: 0.7; }
+
+/* ── Successor ───────────────────────────────────────────────────── */
+.successor { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; align-items: start; }
+.successor-text p { max-width: 52ch; }
+.cmp { width: 100%; border-collapse: collapse; font-size: 18px; }
+.cmp th, .cmp td { border: 1px solid #3a3aaa; padding: 6px 9px; text-align: left; }
+.cmp th { color: var(--dos-gold); background: #000a66; }
+.cmp td:first-child { color: var(--dos-grey); }
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+.footer { text-align: center; }
+.footer p { margin: 6px 0; }
+
+/* ── CRT effect (subtle, toggleable) ─────────────────────────────── */
+.crt-overlay {
+  position: fixed; inset: 0; z-index: 9998; pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.0) 0px,
+      rgba(0,0,0,0.0) 2px,
+      rgba(0,0,0,0.16) 3px,
+      rgba(0,0,0,0.16) 4px);
+  mix-blend-mode: multiply;
+  opacity: 1;
+  transition: opacity .25s;
+}
+.crt-overlay::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 50%,
+      rgba(0,0,0,0) 60%, rgba(0,0,0,0.28) 100%);
+}
+body.crt-off .crt-overlay { opacity: 0; }
+body.crt-on  { text-shadow: 0 0 2px rgba(150,180,255,0.45); }
+
+.crt-toggle {
+  position: fixed; right: 12px; bottom: 12px; z-index: 9999;
+  font-family: inherit; font-size: 17px;
+  color: var(--dos-cyan); background: #000a66;
+  border: 2px solid var(--border); border-radius: 2px;
+  padding: 5px 12px; cursor: pointer;
+}
+.crt-toggle:hover { background: #1414aa; }
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  body { font-size: 20px; }
+  .hero-grid { grid-template-columns: 1fr; }
+  .cross { display: none; }
+  .compare, .gallery, .downloads, .successor { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition: none; }
+}
