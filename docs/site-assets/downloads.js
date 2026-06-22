@@ -12,12 +12,13 @@
   // Intel asset is never wired to an Apple-Silicon button (and vice versa).
   // The ci-helpers release workflow names assets:
   //   pravkal-<tag>-{linux-x86_64,macos-arm64,macos-x86_64}.{tar.gz,dmg,deb,rpm,AppImage}
-  //   pravkal-<tag>-windows-x86_64.zip   (a zip, NOT a bare .exe)
+  //   pravkal-<tag>-windows-x86_64.exe  (standalone)  and  ...windows-x86_64.zip  (exe + data)
   function classify(name) {
     var n = name.toLowerCase();
     if (n.endsWith(".deb")) return "deb";
     if (n.endsWith(".rpm")) return "rpm";
     if (n.endsWith(".appimage")) return "appimage";
+    if (n.indexOf("windows") !== -1 && n.endsWith(".exe")) return "winexe";
     if (n.indexOf("windows") !== -1 && n.endsWith(".zip")) return "win";
     if (n.indexOf("macos-arm64") !== -1 && n.endsWith(".dmg")) return "dmg-arm64";
     if (n.indexOf("macos-x86_64") !== -1 && n.endsWith(".dmg")) return "dmg-x64";
@@ -79,7 +80,7 @@
 
       // Hide the Windows "build pending" note once a real asset exists.
       var winNote = document.getElementById("winNote");
-      if (winNote && byKey.win) winNote.style.display = "none";
+      if (winNote && (byKey.winexe || byKey.win)) winNote.style.display = "none";
     })
     .catch(function () {
       // API unreachable (offline / rate-limited): keep the static fallback
