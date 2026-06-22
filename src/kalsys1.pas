@@ -152,22 +152,22 @@ begin
     co[i] := bg or (co[i] and $0F);
 end;
 
-{ ── Month names (Serbian Latin) ────────────────────────────────────── }
+{ ── Month names (Serbian Cyrillic) ─────────────────────────────────── }
 
 procedure initMonthNames;
 begin
-  imm[1]  := 'Januar';
-  imm[2]  := 'Februar';
-  imm[3]  := 'Mart';
-  imm[4]  := 'April';
-  imm[5]  := 'Maj';
-  imm[6]  := 'Jun';
-  imm[7]  := 'Jul';
-  imm[8]  := 'Avgust';
-  imm[9]  := 'Septembar';
-  imm[10] := 'Oktobar';
-  imm[11] := 'Novembar';
-  imm[12] := 'Decembar';
+  imm[1]  := 'Јануар';
+  imm[2]  := 'Фебруар';
+  imm[3]  := 'Март';
+  imm[4]  := 'Април';
+  imm[5]  := 'Мај';
+  imm[6]  := 'Јун';
+  imm[7]  := 'Јул';
+  imm[8]  := 'Август';
+  imm[9]  := 'Септембар';
+  imm[10] := 'Октобар';
+  imm[11] := 'Новембар';
+  imm[12] := 'Децембар';
 end;
 
 { ── Printing cross (6 lines, used in stampaj) ────────────────────── }

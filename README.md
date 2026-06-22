@@ -24,6 +24,11 @@ Free Pascal compiler.
 програма написаног у Turbo Pascal-у — прилагођен за рад на савременим
 системима (Linux, Windows, macOS) уз помоћ Free Pascal компилатора.
 
+> **v1.0.0:** Кориснички интерфејс је у потпуности на српској ћирилици, а
+> ивице прозора користе праве линијске знакове (Unicode box-drawing). Захтева
+> UTF-8 терминал. / The interface is fully in Serbian Cyrillic and window
+> borders use real Unicode box-drawing glyphs; a UTF-8 terminal is required.
+
 | English | Српски |
 |---------|--------|
 | Monthly calendar view with Julian dates | Приказ месечног календара са јулијанским датумима |
@@ -208,7 +213,8 @@ PravKal/
 - [ ] **Help (F1)**: shows in strip, no dialog implemented
 - [ ] **Contents (Alt-F1)**: no implementation
 - [ ] **Scrolling animation within month**: `premwindsve` is a no-op stub; month view redraws fully on scroll (no smooth line-by-line scroll as in original DOS version)
-- [ ] **Box-drawing characters**: uses ASCII art (`+`, `-`, `|`) instead of Unicode box-drawing (╔, ║, ═, …); upgrade planned for Lazarus GUI port
+- [x] **Box-drawing characters**: now uses Unicode single-line box-drawing glyphs (`┌ ─ ┐ │ └ ┘ ├ ┤ ┬ ┴ ┼`) with correct grid junctions (since v1.0.0)
+- [ ] **Multi-byte search input editing**: typing/back-spacing Cyrillic in the feast-search box edits by UTF-8 byte, not by glyph (cosmetic; matching still works)
 
 ---
 
@@ -261,7 +267,6 @@ are all present in expanded form there.
   LCL (Lazarus Component Library) for native GUI on Linux, Windows, macOS
 - **Larger screen support**: parameterise `SCREEN_W` / `SCREEN_H`, remove
   80×25 hardcoding
-- **Unicode box drawing**: upgrade ASCII art to UTF-8 box chars
 - **Hagiography**: integrate Serbian Prologue (Prolog iz Ohrida) content
   for feast-day texts in `.KAL` files
 - **Extended date range**: current algorithm handles 0 AD – 4000 AD correctly

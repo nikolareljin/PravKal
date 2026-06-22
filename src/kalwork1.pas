@@ -50,24 +50,23 @@ implementation
 
 procedure setAttr(attr: byte);
 begin
-  TextColor(attr and $0F);
-  TextBackground((attr shr 4) and $07);
+  scrAttr(attr);
 end;
 
 { ── Basic positioned output ─────────────────────────────────────── }
 
 procedure elwrite(x, y: integer; const s: string);
 begin
-  GotoXY(x, y);
-  Write(s);
+  scrGoto(x, y);
+  scrPut(s);
 end;
 
 procedure elwritecol(x, y: integer; const s: string; col: byte);
 begin
-  GotoXY(x, y);
+  scrGoto(x, y);
   setAttr(col);
-  Write(s);
-  NormVideo;
+  scrPut(s);
+  scrNorm;
 end;
 
 { ── Window: draws a bordered box, clears interior ───────────────── }
@@ -83,32 +82,32 @@ begin
   h := y2 - y1;   { interior height }
   setAttr(col1);
   { top border }
-  GotoXY(x1, y1);
-  Write(BOX_ULC + niz(w - 1, BOX_H) + BOX_URC);
+  scrGoto(x1, y1);
+  scrPut(BOX_ULC + nizs(w - 1, BOX_H) + BOX_URC);
   { side borders + clear interior }
   for row := y1 + 1 to y2 - 1 do
   begin
-    GotoXY(x1, row);
+    scrGoto(x1, row);
     setAttr(col1);
-    Write(BOX_V);
+    scrPut(BOX_V);
     setAttr(col2);
-    Write(niz(w - 1, ' '));
+    scrPut(niz(w - 1, ' '));
     setAttr(col1);
-    Write(BOX_V);
+    scrPut(BOX_V);
   end;
   { bottom border }
-  GotoXY(x1, y2);
+  scrGoto(x1, y2);
   setAttr(col1);
-  Write(BOX_LLC + niz(w - 1, BOX_H) + BOX_LRC);
+  scrPut(BOX_LLC + nizs(w - 1, BOX_H) + BOX_LRC);
   { optional title, centred on top border }
   if length(title) > 0 then
   begin
-    col := x1 + (w - length(title)) div 2;
-    GotoXY(col, y1);
+    col := x1 + (w - dlen(title)) div 2;
+    scrGoto(col, y1);
     setAttr(col2);
-    Write(title);
+    scrPut(title);
   end;
-  NormVideo;
+  scrNorm;
 end;
 
 { ── Flood-colour a rectangular region ──────────────────────────── }
@@ -119,10 +118,10 @@ begin
   setAttr(col);
   for row := y1 to y2 do
   begin
-    GotoXY(x1, row);
-    Write(niz(x2 - x1 + 1, ' '));
+    scrGoto(x1, row);
+    scrPut(niz(x2 - x1 + 1, ' '));
   end;
-  NormVideo;
+  scrNorm;
 end;
 
 { ── Scroll substitute ───────────────────────────────────────────
@@ -153,10 +152,10 @@ end;
 procedure waitKey(msg: string);
 var dummy: char;
 begin
-  GotoXY((80 - length(msg)) div 2 + 1, 24);
+  scrGoto((80 - dlen(msg)) div 2 + 1, 24);
   setAttr(co[4]);
-  Write(msg);
-  NormVideo;
+  scrPut(msg);
+  scrNorm;
   dummy := ReadKey;
   if dummy = #0 then dummy := ReadKey;
 end;
@@ -170,14 +169,14 @@ begin
   openwind(X1, Y1, X2, Y2, co[27], co[27],
            ' NEA BYZANTIA ', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
-  elwritecol(X1 + 2, Y1 + 2,  'Pravoslavni kalendar v6', co[15]);
-  elwritecol(X1 + 2, Y1 + 4,  'Autori:', co[4]);
-  elwritecol(X1 + 4, Y1 + 5,  'Nikola Reljin', co[17]);
-  elwritecol(X1 + 4, Y1 + 6,  'Ivona Maric', co[17]);
-  elwritecol(X1 + 4, Y1 + 7,  'Nikola Lecic', co[17]);
-  elwritecol(X1 + 2, Y1 + 9,  'Originalni DOS program: Turbo Pascal 6/7', co[17]);
-  elwritecol(X1 + 2, Y1 + 10, 'FPC port: Free Pascal (cross-platform)', co[17]);
-  waitKey(' Pritisnite bilo koji taster... ');
+  elwritecol(X1 + 2, Y1 + 2,  'Православни календар', co[15]);
+  elwritecol(X1 + 2, Y1 + 4,  'Аутори:', co[4]);
+  elwritecol(X1 + 4, Y1 + 5,  'Никола Рељин', co[17]);
+  elwritecol(X1 + 4, Y1 + 6,  'Ивона Марић', co[17]);
+  elwritecol(X1 + 4, Y1 + 7,  'Никола Лечић', co[17]);
+  elwritecol(X1 + 2, Y1 + 9,  'Оригинални DOS програм: Turbo Pascal 6/7', co[17]);
+  elwritecol(X1 + 2, Y1 + 10, 'FPC порт: Free Pascal (вишеплатформски)', co[17]);
+  waitKey(' Притисните било који тастер...');
 end;
 
 { ── Set active month / year dialog ─────────────────────────────── }
@@ -193,23 +192,22 @@ var
 begin
   setdat := false;
   openwind(X1, Y1, X2, Y2, co[27], co[27],
-           ' Promena datuma ', 0,
+           ' Промена датума ', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
   nm := m;
   ng := g;
   ok := false;
   repeat
-    elwritecol(X1 + 2, Y1 + 2, 'Mesec (1-12): ', co[4]);
-    setAttr(co[15]);
+    elwritecol(X1 + 2, Y1 + 2, 'Месец (1-12): ', co[4]);
     Str(nm, buf);
-    Write(buf + '   ');
-    elwritecol(X1 + 2, Y1 + 4, 'Godina:       ', co[4]);
-    setAttr(co[15]);
+    { keep all output on the UTF-8-safe scr* layer; mixing crt Write here
+      desyncs the cursor and corrupts the Cyrillic/box-glyph layout }
+    elwritecol(X1 + 16, Y1 + 2, buf + '   ', co[15]);
+    elwritecol(X1 + 2, Y1 + 4, 'Година:       ', co[4]);
     Str(ng, buf);
-    Write(buf + '     ');
-    NormVideo;
-    elwritecol(X1 + 2, Y1 + 6, 'Enter=potvrdi  Esc=odustani', co[17]);
-    elwritecol(X1 + 2, Y1 + 7, 'PgUp/PgDn mesec,  +/- godina', co[17]);
+    elwritecol(X1 + 16, Y1 + 4, buf + '     ', co[15]);
+    elwritecol(X1 + 2, Y1 + 6, 'Enter=потврди  Esc=одустани', co[17]);
+    elwritecol(X1 + 2, Y1 + 7, 'PgUp/PgDn месец,  +/- година', co[17]);
     k := ReadKey;
     if k = #0 then k := ReadKey;
     case k of
@@ -231,12 +229,12 @@ end;
 function postName(idx: integer): string;
 begin
   case idx of
-    1: postName := 'Veliki post (pred Vasrks)';
-    2: postName := 'Apostolski post';
-    3: postName := 'Preobrazenjski post / Gospojinski post';
-    4: postName := 'Bozicnji post (Filipovka)';
-    5: postName := 'Sredom i petkom';
-  else postName := 'Post';
+    1: postName := 'Велики пост (пред Васкрс)';
+    2: postName := 'Апостолски пост';
+    3: postName := 'Преображењски пост / Госпојински пост';
+    4: postName := 'Божићни пост (Филиповка)';
+    5: postName := 'Средом и петком';
+  else postName := 'Пост';
   end;
 end;
 
@@ -249,10 +247,10 @@ var
   row, i : integer;
 begin
   openwind(X1, Y1, X2, Y2, co[27], co[27],
-           ' Postovi ' + strf(g), 0,
+           ' Постови ' + strf(g), 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
   row := Y1 + 2;
-  elwritecol(X1 + 2, row, 'Visednevni postovi:', co[15]);
+  elwritecol(X1 + 2, row, 'Вишедневни постови:', co[15]);
   inc(row, 2);
   for i := 1 to 4 do
   begin
@@ -264,8 +262,8 @@ begin
     inc(row);
   end;
   inc(row);
-  elwritecol(X1 + 2, row, 'Napomena: svi datumi su po starom (Julijanskom) kalendaru.', co[6]);
-  waitKey(' Pritisnite bilo koji taster... ');
+  elwritecol(X1 + 2, row, 'Напомена: сви датуми су по старом (Јулијанском) календару.', co[6]);
+  waitKey(' Притисните било који тастер...');
 end;
 
 { ── Heortology (feast text viewer) ─────────────────────────────── }
@@ -284,9 +282,9 @@ var
   k      : char;
 begin
   openwind(X1, Y1, X2, Y2, co[27], co[27],
-           ' Heortologija ', 0,
+           ' Хеортологија ', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
-  elwritecol(X1 + 2, Y1 + 2, 'Dostupni tekstovi:', co[15]);
+  elwritecol(X1 + 2, Y1 + 2, 'Доступни текстови:', co[15]);
   row := Y1 + 4;
   for i := 1 to 6 do
   begin
@@ -303,7 +301,7 @@ begin
       inc(row);
     end;
   end;
-  waitKey(' Pritisnite bilo koji taster... ');
+  waitKey(' Притисните било који тастер...');
 end;
 
 { ── Indiction table ─────────────────────────────────────────────── }
@@ -319,12 +317,12 @@ var
   leap: string[1];
 begin
   openwind(X1, Y1, X2, Y2, co[27], co[27],
-           ' Veliki indiktion ', 0,
+           ' Велики индиктион ', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
   elwritecol(X1 + 2, Y1 + 1,
-    '  God.  Datum Vaskrsa  Prst.', co[15]);
+    '  Год.  Датум Васкрса  Прст.', co[15]);
   elwritecol(X1 + 2 + COLGAP * 2, Y1 + 1,
-    '  God.  Datum Vaskrsa  Prst.', co[15]);
+    '  Год.  Датум Васкрса  Прст.', co[15]);
   { Show next 56 years (4 columns of 14) }
   for ig := 1 to ROWS * COLS do
   begin
@@ -339,7 +337,7 @@ begin
       strf(d) + '.' + strf(m) + '.  ' + leap,
       co[17]);
   end;
-  waitKey(' Pritisnite bilo koji taster... ');
+  waitKey(' Притисните било који тастер...');
 end;
 
 { ── Export fasting schedule to plain-text file (F8) ─────────────── }
@@ -359,7 +357,19 @@ var lines : TKTXTLines;
 
   procedure wline(const s: string);
   begin
-    addLine('|  ' + s + niz(W - 2 - length(s), ' ') + '|');
+    addLine(BOX_V + '  ' + s + niz(W - 2 - dlen(s), ' ') + BOX_V);
+  end;
+
+  { Left-label row, padded by visible width. }
+  procedure lline(const s: string);
+  begin
+    addLine(BOX_V + ' ' + s + niz(W - 1 - dlen(s), ' ') + BOX_V);
+  end;
+
+  { Blank interior row. }
+  procedure bline;
+  begin
+    addLine(BOX_V + niz(W, ' ') + BOX_V);
   end;
 
 begin
@@ -368,52 +378,51 @@ begin
 
   for i := 1 to 6 do addLine(krst1[i]);
   addLine('');
-  hdr := 'POSTOVI ' + strf(g);
-  addLine('+' + niz(W, '-') + '+');
-  addLine('|' + niz((W - length(hdr)) div 2, ' ') + hdr +
-          niz(W - length(hdr) - (W - length(hdr)) div 2, ' ') + '|');
-  addLine('+' + niz(W, '-') + '+');
-  addLine('|' + niz(W, ' ') + '|');
-  addLine('| Visednevni postovi:' + niz(W - 20, ' ') + '|');
-  addLine('|' + niz(W, ' ') + '|');
+  hdr := 'ПОСТОВИ ' + strf(g);
+  addLine(BOX_ULC + nizs(W, BOX_H) + BOX_URC);
+  addLine(BOX_V + niz((W - dlen(hdr)) div 2, ' ') + hdr +
+          niz(W - dlen(hdr) - (W - dlen(hdr)) div 2, ' ') + BOX_V);
+  addLine(BOX_LTEE + nizs(W, BOX_H) + BOX_RTEE);
+  bline;
+  lline('Вишедневни постови:');
+  bline;
   for i := 1 to 2 do
   begin
-    if i = 1 then pn := 'Veliki post (Casni post)'
-             else pn := 'Apostolski post (Petrovka)';
+    if i = 1 then pn := 'Велики пост (Часни пост)'
+             else pn := 'Апостолски пост (Петровка)';
     ds := strf(postd[i][1][1]) + '.' + strf(postd[i][1][2]) + '. - ' +
           strf(postd[i][2][1]) + '.' + strf(postd[i][2][2]) + '.';
-    addLine('|  ' + pn + niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
+    addLine(BOX_V + '  ' + pn + niz(W - 2 - dlen(pn) - dlen(ds), ' ') + ds + BOX_V);
   end;
   { Fixed fasts }
-  pn := 'Gospojinski post';          ds := '1.8. - 14.8.';
-  addLine('|  ' + pn + niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
-  pn := 'Bozicnji post (Filipovka)'; ds := '14.11. - 24.12.';
-  addLine('|  ' + pn + niz(W - 2 - length(pn) - length(ds), ' ') + ds + '|');
-  addLine('|' + niz(W, ' ') + '|');
-  addLine('| Jednodevni postovi:' + niz(W - 20, ' ') + '|');
-  addLine('|' + niz(W, ' ') + '|');
-  wline('Sreda i petak (celogodisnje)');
-  wline('Bogojavljenjski soceljnik - 5. januar');
-  wline('Krstovdan (Vozdvizenje) - 14. septembar');
-  wline('Usekovanje glave sv. Jovana - 29. avgust');
-  addLine('|' + niz(W, ' ') + '|');
-  addLine('| Napomena: datumi su po Julijanskom kalendaru.' +
-          niz(W - 46, ' ') + '|');
-  addLine('+' + niz(W, '-') + '+');
+  pn := 'Госпојински пост';          ds := '1.8. - 14.8.';
+  addLine(BOX_V + '  ' + pn + niz(W - 2 - dlen(pn) - dlen(ds), ' ') + ds + BOX_V);
+  pn := 'Божићни пост (Филиповка)'; ds := '14.11. - 24.12.';
+  addLine(BOX_V + '  ' + pn + niz(W - 2 - dlen(pn) - dlen(ds), ' ') + ds + BOX_V);
+  bline;
+  lline('Једнодневни постови:');
+  bline;
+  wline('Среда и петак (целогодишње)');
+  wline('Богојављењски сочељник - 5. јануар');
+  wline('Крстовдан (Воздвижење) - 14. септембар');
+  wline('Усековање главе св. Јована - 29. август');
+  bline;
+  lline('Напомена: датуми су по Јулијанском календару.');
+  addLine(BOX_LLC + nizs(W, BOX_H) + BOX_LRC);
 
   if writeTXTLines(fname, nl, lines) then
   begin
-    openwind(8, 10, 71, 15, co[27], co[27], ' Izvoz u TXT ', 0,
+    openwind(8, 10, 71, 15, co[27], co[27], ' Извоз у TXT ', 0,
              false, false, false, false, wsingle, 0, 0, true, false, 0);
-    elwritecol(10, 11, 'TXT snimljen:', co[4]);
+    elwritecol(10, 11, 'TXT снимљен:', co[4]);
     elwritecol(10, 12, fname, co[15]);
     waitKey('');
   end
   else
   begin
-    openwind(8, 10, 71, 15, co[27], co[27], ' Greska ', 0,
+    openwind(8, 10, 71, 15, co[27], co[27], ' Грешка ', 0,
              false, false, false, false, wsingle, 0, 0, true, false, 0);
-    elwritecol(10, 11, 'Greska pri snimanju TXT fajla!', co[6]);
+    elwritecol(10, 11, 'Грешка при снимању TXT фајла!', co[6]);
     elwritecol(10, 12, fname, co[17]);
     waitKey('');
   end;
@@ -425,24 +434,24 @@ procedure pomoc;
 const X1 = 5; Y1 = 3; X2 = 74; Y2 = 22;
 begin
   openwind(X1, Y1, X2, Y2, co[27], co[27],
-           ' Pomoc - Tastatura ', 0,
+           ' Помоћ — Тастатура ', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
-  elwritecol(X1+2, Y1+2,  'Tastatura:', co[4]);
-  elwritecol(X1+4, Y1+3,  'F1          Pomoc (ova poruka)', co[17]);
-  elwritecol(X1+4, Y1+4,  'F3          Promena aktivnog datuma', co[17]);
-  elwritecol(X1+4, Y1+5,  'F5          Heortologija (tekstovi praznika)', co[17]);
-  elwritecol(X1+4, Y1+6,  'F7          Izvoz meseca u TXT fajl', co[17]);
-  elwritecol(X1+4, Y1+7,  'F8          Izvoz postova u TXT fajl', co[17]);
-  elwritecol(X1+4, Y1+8,  'F10         Aktiviranje menija', co[17]);
-  elwritecol(X1+4, Y1+9,  'Ctrl-P      Tabela postova za godinu', co[17]);
-  elwritecol(X1+4, Y1+10, 'Ctrl-C      Izlazak iz programa', co[17]);
-  elwritecol(X1+4, Y1+11, 'PgUp/PgDn   Pomeranje prikaza gore/dole', co[17]);
-  elwritecol(X1+2, Y1+13, 'Boje praznika u kalendaru:', co[4]);
-  elwritecol(X1+4, Y1+14, 'Zuto  = Nedeljni dan / Veliki praznik', co[15]);
-  elwritecol(X1+4, Y1+15, 'Plavo = Srednji praznik', co[16]);
-  elwritecol(X1+4, Y1+16, 'Sivo  = Manji praznik', co[17]);
-  elwritecol(X1+4, Y1+17, '*     = Posni dan', co[19]);
-  waitKey(' Pritisnite bilo koji taster... ');
+  elwritecol(X1+2, Y1+2,  'Тастатура:', co[4]);
+  elwritecol(X1+4, Y1+3,  'F1          Помоћ (ова порука)', co[17]);
+  elwritecol(X1+4, Y1+4,  'F3          Промена активног датума', co[17]);
+  elwritecol(X1+4, Y1+5,  'F5          Хеортологија (текстови празника)', co[17]);
+  elwritecol(X1+4, Y1+6,  'F7          Извоз месеца у TXT фајл', co[17]);
+  elwritecol(X1+4, Y1+7,  'F8          Извоз постова у TXT фајл', co[17]);
+  elwritecol(X1+4, Y1+8,  'F10         Активирање менија', co[17]);
+  elwritecol(X1+4, Y1+9,  'Ctrl-P      Табела постова за годину', co[17]);
+  elwritecol(X1+4, Y1+10, 'Ctrl-C      Излазак из програма', co[17]);
+  elwritecol(X1+4, Y1+11, 'PgUp/PgDn   Померање приказа горе/доле', co[17]);
+  elwritecol(X1+2, Y1+13, 'Боје празника у календару:', co[4]);
+  elwritecol(X1+4, Y1+14, 'Жуто  = Недељни дан / Велики празник', co[15]);
+  elwritecol(X1+4, Y1+15, 'Плаво = Средњи празник', co[16]);
+  elwritecol(X1+4, Y1+16, 'Сиво  = Мањи празник', co[17]);
+  elwritecol(X1+4, Y1+17, '*     = Посни дан', co[19]);
+  waitKey(' Притисните било који тастер...');
 end;
 
 { ── Help: table of contents (Sadrzaj) ───────────────────────────────── }
@@ -451,20 +460,20 @@ procedure sadrzaj;
 const X1 = 5; Y1 = 3; X2 = 74; Y2 = 22;
 begin
   openwind(X1, Y1, X2, Y2, co[27], co[27],
-           ' Sadrzaj - Uputstvo ', 0,
+           ' Садржај — Упутство ', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
-  elwritecol(X1+2, Y1+2,  'Pravoslavni kalendar v6 - pregled funkcija:', co[15]);
-  elwritecol(X1+2, Y1+4,  '1. KALENDAR (glavna strana)', co[4]);
-  elwritecol(X1+4, Y1+5,  'Mesecni prikaz pravoslavnih praznika.', co[17]);
-  elwritecol(X1+4, Y1+6,  'G = Gregorij. dan, J = Julij. dan; boja = rang praznika.', co[17]);
-  elwritecol(X1+2, Y1+8,  '2. OPCIJE (meni, F3/F5/Ctrl-P)', co[4]);
-  elwritecol(X1+4, Y1+9,  'Promena datuma, tabela postova, heortologija, indiktion.', co[17]);
-  elwritecol(X1+2, Y1+11, '3. TRAGANJE (meni)', co[4]);
-  elwritecol(X1+4, Y1+12, 'Pretraga po datumu, prazniku, postu ili liturgijskoj nedelji.', co[17]);
-  elwritecol(X1+2, Y1+14, '4. IZVOZ (F7 / F8)', co[4]);
-  elwritecol(X1+4, Y1+15, 'Izvoz mesecnog kalendara ili tabele postova u TXT.', co[17]);
-  elwritecol(X1+2, Y1+17, 'Napomena: datumi su po julijanskom (starom) kalendaru.', co[6]);
-  waitKey(' Pritisnite bilo koji taster... ');
+  elwritecol(X1+2, Y1+2,  'Православни календар — преглед функција:', co[15]);
+  elwritecol(X1+2, Y1+4,  '1. КАЛЕНДАР (главна страна)', co[4]);
+  elwritecol(X1+4, Y1+5,  'Месечни приказ православних празника.', co[17]);
+  elwritecol(X1+4, Y1+6,  'G = Грегориј. дан, J = Јулиј. дан; боја = ранг празника.', co[17]);
+  elwritecol(X1+2, Y1+8,  '2. ОПЦИЈЕ (мени, F3/F5/Ctrl-P)', co[4]);
+  elwritecol(X1+4, Y1+9,  'Промена датума, табела постова, хеортологија, индиктион.', co[17]);
+  elwritecol(X1+2, Y1+11, '3. ТРАГАЊЕ (мени)', co[4]);
+  elwritecol(X1+4, Y1+12, 'Претрага по датуму, празнику, посту или литургијској недељи.', co[17]);
+  elwritecol(X1+2, Y1+14, '4. ИЗВОЗ (F7 / F8)', co[4]);
+  elwritecol(X1+4, Y1+15, 'Извоз месечног календара или табеле постова у TXT.', co[17]);
+  elwritecol(X1+2, Y1+17, 'Напомена: датуми су по јулијанском (старом) календару.', co[6]);
+  waitKey(' Притисните било који тастер...');
 end;
 
 { ── Configuration dialog ────────────────────────────────────────────── }
@@ -473,8 +482,8 @@ procedure konfig;
 const
   X1 = 18; Y1 = 7; X2 = 61; Y2 = 18;
   NTHEMES = 3;
-  TNAMES  : array[1..NTHEMES] of string[22] = (
-    'Plava (podrazumevana)', 'Zelena', 'Crno-bela');
+  TNAMES  : array[1..NTHEMES] of string[44] = (
+    'Плава (подразумевана)', 'Зелена', 'Црно-бела');
 var
   sel, orig, i : integer;
   k            : char;
@@ -484,16 +493,16 @@ begin
   repeat
     applyTheme(sel - 1);
     openwind(X1, Y1, X2, Y2, co[27], co[27],
-             ' Konfiguracija ', 0,
+             ' Конфигурација ', 0,
              false, false, false, false, wsingle, 0, 0, true, false, 0);
-    elwritecol(X1+2, Y1+2, 'Tema ekrana:', co[4]);
+    elwritecol(X1+2, Y1+2, 'Тема екрана:', co[4]);
     for i := 1 to NTHEMES do
       if i = sel then
         elwritecol(X1+4, Y1+3+i, '> ' + TNAMES[i], co[15])
       else
         elwritecol(X1+4, Y1+3+i, '  ' + TNAMES[i], co[17]);
-    elwritecol(X1+2, Y1+8, 'Strelice = izbor,  Enter = primeni', co[17]);
-    elwritecol(X1+2, Y1+9, 'Esc = odustani (vraca prethodnu temu)', co[17]);
+    elwritecol(X1+2, Y1+8, 'Стрелице = избор,  Enter = примени', co[17]);
+    elwritecol(X1+2, Y1+9, 'Esc = одустани (враћа претходну тему)', co[17]);
     k := scankey;
     case k of
       upkey:   if sel > 1 then dec(sel) else sel := NTHEMES;
@@ -521,10 +530,10 @@ begin
   {$I+}
   if IOResult <> 0 then
   begin
-    openwind(15, 11, 65, 14, co[27], co[27], ' Greska ', 0,
+    openwind(15, 11, 65, 14, co[27], co[27], ' Грешка ', 0,
              false, false, false, false, wsingle, 0, 0, true, false, 0);
-    elwritecol(17, 12, 'Ne mogu snimiti: ' + fname, co[6]);
-    waitKey(' Taster za nastavak... ');
+    elwritecol(17, 12, 'Не могу снимити: ' + fname, co[6]);
+    waitKey(' Тастер за наставак...');
     exit;
   end;
   {$I-}
@@ -533,10 +542,10 @@ begin
   if IOResult <> 0 then
   begin
     {$I-} Close(f); {$I+}  { best-effort close }
-    openwind(15, 11, 65, 14, co[27], co[27], ' Greska ', 0,
+    openwind(15, 11, 65, 14, co[27], co[27], ' Грешка ', 0,
              false, false, false, false, wsingle, 0, 0, true, false, 0);
-    elwritecol(17, 12, 'Greska pri pisanju: ' + fname, co[6]);
-    waitKey(' Taster za nastavak... ');
+    elwritecol(17, 12, 'Грешка при писању: ' + fname, co[6]);
+    waitKey(' Тастер за наставак...');
     exit;
   end;
   {$I-}
@@ -544,16 +553,16 @@ begin
   {$I+}
   if IOResult <> 0 then
   begin
-    openwind(15, 11, 65, 14, co[27], co[27], ' Greska ', 0,
+    openwind(15, 11, 65, 14, co[27], co[27], ' Грешка ', 0,
              false, false, false, false, wsingle, 0, 0, true, false, 0);
-    elwritecol(17, 12, 'Greska pri pisanju: ' + fname, co[6]);
-    waitKey(' Taster za nastavak... ');
+    elwritecol(17, 12, 'Грешка при писању: ' + fname, co[6]);
+    waitKey(' Тастер за наставак...');
     exit;
   end;
-  openwind(15, 11, 65, 14, co[27], co[27], ' Konfiguracija snimljena ', 0,
+  openwind(15, 11, 65, 14, co[27], co[27], ' Конфигурација снимљена ', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
-  elwritecol(17, 12, 'Snimljeno: ' + fname, co[4]);
-  waitKey(' Taster za nastavak... ');
+  elwritecol(17, 12, 'Снимљено: ' + fname, co[4]);
+  waitKey(' Тастер за наставак...');
 end;
 
 { ── Load configuration from KALENDAR.CFG ────────────────────────────── }

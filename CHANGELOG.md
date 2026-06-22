@@ -2,6 +2,41 @@
 
 All notable changes to this project are documented here.
 
+## [1.0.0] — 2026-06-21
+
+### Added
+- Serbian Cyrillic across the entire UI — menus, dialogs, help, search, the
+  feast database (372 entries), month/day names, and the TXT exports
+- UTF-8-aware layout helpers: `dlen()` (visible-column width by counting
+  codepoints, not bytes) and `nizs()` (repeat a multi-byte string)
+- Cyrillic-aware `upcasestr()` so the month-title header renders all-caps
+- UTF-8-safe raw screen layer (`scrGoto`/`scrPut`/`scrAttr`/`scrCls`) that
+  writes ANSI directly, bypassing FPC `crt`'s byte-based cursor/wrap tracking
+
+### Fixed
+- Screen corruption with multi-byte glyphs: FPC `crt` counts bytes (not
+  display columns) for line-wrapping, so Cyrillic/box-drawing rows wrapped
+  mid-line and shifted the layout. All screen output now goes through the raw
+  ANSI layer; `crt` is used only for keyboard input
+
+### Changed
+- TUI borders now use proper single-line box-drawing glyphs
+  (`┌ ─ ┐ │ └ ┘ ├ ┤ ┬ ┴ ┼`) instead of ASCII `+ - |`, matching the original
+  DOS application; calendar grid uses correct tee/cross junctions
+- Heortologija prose data files (`data/_PRAZ1..6.KAL`, `_GRESKE.MOL`)
+  translated to Cyrillic
+- String-type capacities widened (`prstr`, `tbstr`, `da`, `kfun.sta`, theme
+  names) to hold the 2-bytes-per-letter UTF-8 Cyrillic without overflow
+- Day-of-week initials changed from a `char` array to a string array
+  (`Н П У С Ч П С`), since a Cyrillic glyph no longer fits in one byte
+- All layout math switched from `length()` (bytes) to `dlen()` (visible
+  columns) so grid, menus, and centered dialog titles stay aligned
+
+### Notes
+- Requires a UTF-8 terminal (standard on modern Linux/macOS)
+- Search input still edits Cyrillic by UTF-8 byte rather than glyph (cosmetic;
+  matching works) — see README known limitations
+
 ## [0.2.1] — 2026-06-12
 
 ### Fixed

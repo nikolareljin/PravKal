@@ -4,7 +4,7 @@ program pravkal;
 uses crt, SysUtils, nizz, kalsys1, kalmenu1, kalwork1, kaltxt;
 
 const
-  VERSION = '0.2.1';
+  VERSION = '1.0.0';
 
 procedure showHelp;
 begin
@@ -60,7 +60,9 @@ const
   mmcrt_ : array[1..jmmax] of byte = (0,5,0,4,0);
 
   bmd: array[1..12] of integer = (31,28,31,30,31,30,31,31,30,31,30,31);
-  dun: array[0..6] of char = 'NPUSCPS';
+  { Day-of-week initials, Cyrillic: Недеља Понедељак Уторак Среда Четвртак
+    Петак Субота. String (not char) array because each glyph is multi-byte. }
+  dun: array[0..6] of kstr = ('Н','П','У','С','Ч','П','С');
 
   { Layout driver string: 'a'=top-separator 'b'=Sunday-label 'c'=mid-separator
     digit/letter=day row.  Repeated 63-char pattern covers all week layouts. }
@@ -68,427 +70,427 @@ const
      'abc0123456abc0123456abc0123456abc0123456abc0123456abc0123456abc';
 
   nedelja: array[1..19] of pathstr = (
-    'Nedelja o mitaru i fariseju',
-    'Nedelja o bludnom sinu',
-    'Nedelja mesopusna',
-    'Nedelja siropusna',
-    'Nedelja prva posta - Cista Pravoslavlja',
-    'Nedelja druga posta - Pacista',
-    'Nedelja treca posta - Krstopoklona',
-    'Nedelja cetvrta posta - Sredoposna',
-    'Nedelja peta posta - Gluvna',
-    'Nedelja sesta posta - Cvetna',
-    'Nedelja svetla. Na lit. ap.1.Jev.Jn zac 1 /1,1-17/',
-    'Nedelja druga - Tomina',
-    'Nedelja treca - Mironosnica',
-    'Nedelja cetvrta - Raslabljenog',
-    'Nedelja peta - Samarjanke',
-    'Nedelja sesta - Slepoga',
-    'Nedelja sedma - Svetih Otaca',
-    'Nedelja Pedesetnice',
-    'Nedelja prva po Duhovima - Svih Svetih');
+    'Недеља о митару и фарисеју',
+    'Недеља о блудном сину',
+    'Недеља месопусна',
+    'Недеља сиропусна',
+    'Недеља прва поста - Чиста Православља',
+    'Недеља друга поста - Пачиста',
+    'Недеља трећа поста - Крстопоклона',
+    'Недеља четврта поста - Средопосна',
+    'Недеља пета поста - Глувна',
+    'Недеља шеста поста - Цветна',
+    'Недеља светла. На лит. ап.1.Јев.Јн зач 1 /1,1-17/',
+    'Недеља друга - Томина',
+    'Недеља трећа - Мироносница',
+    'Недеља четврта - Раслабљеног',
+    'Недеља пета - Самарјанке',
+    'Недеља шеста - Слепога',
+    'Недеља седма - Светих Отаца',
+    'Недеља Педесетнице',
+    'Недеља прва по Духовима - Свих Светих');
 
   brvp = 5;
   vazpr: array[1..brvp] of prstr = (
-    'Blagovesti',
-    'Vozdvizenje Casnog Krsta - Krstovdan',
-    'Rozdestvo Presvete Bogorodice',
-    'Vavedenje Presvete Bogorodice',
-    'Bozic - Rozdestvo Gospoda Isusa Hrista');
+    'Благовести',
+    'Воздвижење Часног Крста - Крстовдан',
+    'Рождество Пресвете Богородице',
+    'Ваведење Пресвете Богородице',
+    'Божић - Рождество Господа Исуса Христа');
 
   praz: array[1..12] of array[1..31] of prstr = (
-    ('cJAN.- Obrez.GIHr; sv.Vasilije; N.god. ',
-     'oSveta Sila i sveti Serafim Sarovski',
-     'oSveti prorok Malahije i sv. mucenik Gordije',
-     'oSabor svetih 70 apost.;sv.Jevstatije srpski',
-     'mSv.mucenik Teopempt i Teona - Krstovdan',
-     'cBogojavljenje',
-     'cSabor svetog Jovana Krstitelja - Jovanjdan',
-     'oPrepodobni Georgije Hozevit; sv.Grig.Ohrid.',
-     'oSveti mucenik Polievkt; sv. Filip Moskovski',
-     'oSveti Grigorije Niski i prep. Dometijan',
-     'oPrepodobni Teodosije Veliki i prep. Mihailo',
-     'oSveta mucenica Tatijana',
-     'oSveti muc. Ermil i Stratonik (Odan.Bogoj.)',
-     'cSveti Sava prvi arhiepiskop srpski',
-     'oPrepidobni Pavle; prep. Gavrilo Lesnovski',
-     'mCasne verige apostola Petra;prep.Romil Rav.',
-     'oPrepodobni Antonije Veliki',
-     'mSveti Atanasije Veliki; sveti Maksim Srpski',
-     'oPrep. Makarije Egipatski; sv. Marko Efeski',
-     'oPrepodobni Jevtimije Veliki',
-     'oPrep. Maksim Ispovednik; sv.muc.Teofan',
-     'oSveti apostol Timotej i prepmuc. Anastasije',
-     'oSvestenomucenik Kliment Ankirski i drugi',
-     'oPrepodobna Ksenija Rimljanka',
-     'oSveti Grigorije Bogoslov',
-     'oPrepodobni Ksenofont i Marija',
-     'oPrenos mostiju svetog Jovana Zlatousta',
-     'oPrepodobni Jefrem Sirin',
-     'oPrenos mostiju Ignjatija Bogonosca',
-     'cSveta Tri Jerarha',
-     'oSveti besrebrenici Kir i Jovan'),
+    ('cЈАН.- Обрез.ГИХр; св.Василије; Н.год. ',
+     'oСвета Сила и свети Серафим Саровски',
+     'oСвети пророк Малахије и св. мученик Гордије',
+     'oСабор светих 70 апост.;св.Јевстатије српски',
+     'mСв.мученик Теопемпт и Теона - Крстовдан',
+     'cБогојављење',
+     'cСабор светог Јована Крститеља - Јовањдан',
+     'oПреподобни Георгије Хозевит; св.Григ.Охрид.',
+     'oСвети мученик Полиевкт; св. Филип Московски',
+     'oСвети Григорије Ниски и преп. Дометијан',
+     'oПреподобни Теодосије Велики и преп. Михаило',
+     'oСвета мученица Татијана',
+     'oСвети муч. Ермил и Стратоник (Одан.Богој.)',
+     'cСвети Сава први архиепископ српски',
+     'oПреподобни Павле; преп. Гаврило Лесновски',
+     'mЧасне вериге апостола Петра;преп.Ромил Рав.',
+     'oПреподобни Антоније Велики',
+     'mСвети Атанасије Велики; свети Максим Српски',
+     'oПреп. Макарије Египатски; св. Марко Ефески',
+     'oПреподобни Јевтимије Велики',
+     'oПреп. Максим Исповедник; св.муч.Теофан',
+     'oСвети апостол Тимотеј и препмуч. Анастасије',
+     'oСвештеномученик Климент Анкирски и други',
+     'oПреподобна Ксенија Римљанка',
+     'oСвети Григорије Богослов',
+     'oПреподобни Ксенофонт и Марија',
+     'oПренос моштију светог Јована Златоуста',
+     'oПреподобни Јефрем Сирин',
+     'oПренос моштију Игњатија Богоносца',
+     'cСвета Три Јерарха',
+     'oСвети бесребреници Кир и Јован'),
 
-    ('oFEB.-Sveti mucenik Trifun (Pretpr.Sretenja)',
-     'cSretenje Gospodnje',
-     'mSveti Simeon i Ana; sv.Jakov arhiep. srpski',
-     'oPrepodobni Isidor Pelusiot',
-     'oSveta mucenica Agapija',
-     'oSveti Fotije i sv.Vukol Smirn. (Odan.Sret.)',
-     'oSveti Partenije Lampsakijski',
-     'oSv. Teodor Stratilat; sv. Sava II srpski',
-     'oSveti mucenik Nikifor',
-     'mSvestenomucenik Haralampije',
-     'oSvestmucenik Vlasije; sv.muc. Djordje Krat.',
-     'oSveti Maletije Antiohijski',
-     'oPrepodobni Simeon Mirotocivi',
-     'mPrepodobni Avksentije; sv.Kiril Slovenski',
-     'oSveti apostol Onisim i prep. Jevsevije',
-     'oSv. muc. Pamfil i Porfirije - Zadusnice',
-     'mSveti velikomucenik Teodor Tiron',
-     'oSveti Lav Rimski i sv. Flavijan Carigradski',
-     'oSveti apostoli Arhip, Filimon i Apfija',
-     'oSveti Lav Katanski i svestenomucenik Sadok',
-     'oPrepodobni Timotej i sveti Evstatije',
-     'oSveti mucenici u Evgeniji',
-     'oSvestenomucenik Polikarp Smirnski',
-     'mI i II obr. glave svetog Jovana Krstitelja',
-     'oSveti Tarasije Carigradski',
-     'oSveti Porfirije episkop gaski',
-     'oPrepodobni Prokopije Dekapolit',
-     'oPrepodobni Vasilije Ispovednik',
-     'oPrepodobni Jovan Kasijan',
-     'oPrep. Vasilije Ispov. i prep. Jovan Kasijan',''),
+    ('oФЕБ.-Свети мученик Трифун (Претпр.Сретења)',
+     'cСретење Господње',
+     'mСвети Симеон и Ана; св.Јаков архиеп. српски',
+     'oПреподобни Исидор Пелусиот',
+     'oСвета мученица Агапија',
+     'oСвети Фотије и св.Вукол Смирн. (Одан.Срет.)',
+     'oСвети Партеније Лампсакијски',
+     'oСв. Теодор Стратилат; св. Сава II српски',
+     'oСвети мученик Никифор',
+     'mСвештеномученик Харалампије',
+     'oСвештмученик Власије; св.муч. Ђорђе Крат.',
+     'oСвети Малетије Антиохијски',
+     'oПреподобни Симеон Мироточиви',
+     'mПреподобни Авксентије; св.Кирил Словенски',
+     'oСвети апостол Онисим и преп. Јевсевије',
+     'oСв. муч. Памфил и Порфирије - Задушнице',
+     'mСвети великомученик Теодор Тирон',
+     'oСвети Лав Римски и св. Флавијан Цариградски',
+     'oСвети апостоли Архип, Филимон и Апфија',
+     'oСвети Лав Катански и свештеномученик Садок',
+     'oПреподобни Тимотеј и свети Евстатије',
+     'oСвети мученици у Евгенији',
+     'oСвештеномученик Поликарп Смирнски',
+     'mI и II обр. главе светог Јована Крститеља',
+     'oСвети Тарасије Цариградски',
+     'oСвети Порфирије епископ гаски',
+     'oПреподобни Прокопије Декаполит',
+     'oПреподобни Василије Исповедник',
+     'oПреподобни Јован Касијан',
+     'oПреп. Василије Испов. и преп. Јован Касијан',''),
 
-    ('oMART- Prepodobnomucenica Evdokija',
-     'oSvestenomucenik Teodot Kirinejski',
-     'oSveti mucenici Evtropije,Kalinik i Vasilisk',
-     'oPrepodobni Gerasim Jordanski',
-     'oSveti mucenik Konon i prep. Marko Podviznik',
-     'oSvetih 42 mucenika iz Amoreje',
-     'oSvetih 7 svestenomucenika hersonskih',
-     'oSveti Teofilakt Ispovednik',
-     'mSvetih 40 mucenika sevastijskih - Mladenci',
-     'oSveti mucenik Kodrat Korintski',
-     'oSveti Sofronije Jerusalimski',
-     'oSveti Grigorije Dvoj., prep.Teofan i Simeon',
-     'oPrenos mostiju svetog Nikifora Carigradskog',
-     'oPrepodobni Benedikt Nursijski',
-     'oSveti mucenik Agapije',
-     'oSveti Aristovul, mucenici Papa i Savin',
-     'mPrepodobni Aleksije - covek Bozji',
-     'oSveti Kiril Jerusalimski',
-     'oSveti mucenici Hrizant, Darija i drugi',
-     'oPrepmuc. Jovan, Sergije, Patrikije i drugi',
-     'oPrepodobni Jovan Ispovednik',
-     'oSvestenomucenik Vasilije Anhirski',
-     'oPrepodobnomucenik Nikon i drugi',
-     'oPrepodobni Zaharije (Pretpr. Blagovesti)',
-     'cBlagovesti',
-     'oSabor sv. arh. Gavrila (Odan.Blag.-I bden)',
-     'oPrepodobna Matrona Solunska',
-     'oPrepodobni Ilarion Novi (II bdenije)',
-     'oSvestenomucenik Marko Aretuski',
-     'oPrepodobni Jovan Lestvicnik',
-     'oPrepodobni Ipatije Gangrijski'),
+    ('oМАРТ- Преподобномученица Евдокија',
+     'oСвештеномученик Теодот Киринејски',
+     'oСвети мученици Евтропије,Калиник и Василиск',
+     'oПреподобни Герасим Јордански',
+     'oСвети мученик Конон и преп. Марко Подвижник',
+     'oСветих 42 мученика из Амореје',
+     'oСветих 7 свештеномученика херсонских',
+     'oСвети Теофилакт Исповедник',
+     'mСветих 40 мученика севастијских - Младенци',
+     'oСвети мученик Кодрат Коринтски',
+     'oСвети Софроније Јерусалимски',
+     'oСвети Григорије Двој., преп.Теофан и Симеон',
+     'oПренос моштију светог Никифора Цариградског',
+     'oПреподобни Бенедикт Нурсијски',
+     'oСвети мученик Агапије',
+     'oСвети Аристовул, мученици Папа и Савин',
+     'mПреподобни Алексије - човек Божји',
+     'oСвети Кирил Јерусалимски',
+     'oСвети мученици Хризант, Дарија и други',
+     'oПрепмуч. Јован, Сергије, Патрикије и други',
+     'oПреподобни Јован Исповедник',
+     'oСвештеномученик Василије Анхирски',
+     'oПреподобномученик Никон и други',
+     'oПреподобни Захарије (Претпр. Благовести)',
+     'cБлаговести',
+     'oСабор св. арх. Гаврила (Одан.Благ.-I бден)',
+     'oПреподобна Матрона Солунска',
+     'oПреподобни Иларион Нови (II бденије)',
+     'oСвештеномученик Марко Аретуски',
+     'oПреподобни Јован Лествичник',
+     'oПреподобни Ипатије Гангријски'),
 
-    ('oAPRIL- Prepodobna Marija Egipcanka',
-     'oPrepodobni Tit Cudotvorac',
-     'oPrepodobni Nikita Ispovednik',
-     'oPrepodobni Josif Himnograf',
-     'mMucenik Agapod',
-     'oSveti Evtihije i prepodobni Grigorije',
-     'oSveti Grogorije Ispovednik',
-     'oSveti apostoli Irodion, Agav i drugi',
-     'oSveti mucenik Evpeihije',
-     'oSveti mucenik Terentije, Pompije',
-     'oSvestenomucenik Antipa Pergamski',
-     'oPrepodobni Vasilije Ispovednik',
-     'oSvestenomucenik Artemon',
-     'oSveti Matrin Ispovednik',
-     'oSveti apostoli Aristarh, Trud i Trofim',
-     'oSvete mucenice Agapija, Hionija i Irina',
-     'oSvestenomucenik Simeon Persijski',
-     'oPrepodobni Jovan',
-     'oPrepodobni Jovan Vethopescernik',
-     'oPrepodobni Teodor; prep. Joasaf srpski',
-     'oSvestenomucenik Januarije',
-     'oPrepodobni Teodor Sikeot',
-     'cSveti velikomucenik Georgije - Djurdjevdan',
-     'oSveti Sava Stratilat; sveti Sava Erdeljski',
-     'mSveti apostol i jevandjelist Marko',
-     'oSvestenomucenik Vasilije Amasijski',
-     'oSpaljivanje mostiju svetog Save',
-     'oSveti apostoli Jason i Sosipatr',
-     'oSveti Vasilije Ostroski',
-     'oSveti apostol Jakov Zevedejev',''),
+    ('oАПРИЛ- Преподобна Марија Египчанка',
+     'oПреподобни Тит Чудотворац',
+     'oПреподобни Никита Исповедник',
+     'oПреподобни Јосиф Химнограф',
+     'mМученик Агапод',
+     'oСвети Евтихије и преподобни Григорије',
+     'oСвети Григорије Исповедник',
+     'oСвети апостоли Иродион, Агав и други',
+     'oСвети мученик Евпеихије',
+     'oСвети мученик Терентије, Помпије',
+     'oСвештеномученик Антипа Пергамски',
+     'oПреподобни Василије Исповедник',
+     'oСвештеномученик Артемон',
+     'oСвети Матрин Исповедник',
+     'oСвети апостоли Аристарх, Труд и Трофим',
+     'oСвете мученице Агапија, Хионија и Ирина',
+     'oСвештеномученик Симеон Персијски',
+     'oПреподобни Јован',
+     'oПреподобни Јован Ветхопештерник',
+     'oПреподобни Теодор; преп. Јоасаф српски',
+     'oСвештеномученик Јануарије',
+     'oПреподобни Теодор Сикеот',
+     'cСвети великомученик Георгије - Ђурђевдан',
+     'oСвети Сава Стратилат; свети Сава Ердељски',
+     'mСвети апостол и јеванђелист Марко',
+     'oСвештеномученик Василије Амасијски',
+     'oСпаљивање моштију светог Саве',
+     'oСвети апостоли Јасон и Сосипатр',
+     'oСвети Василије Острошки',
+     'oСвети апостол Јаков Зеведејев',''),
 
-    ('mMAJ- Sveti prorok Jeremija',
-     'oSveti Atanasije Veliki',
-     'oSveti mucenici Timotej i Mavra',
-     'oSveta mucenica Pelagija Tarsijska',
-     'oSveta velikomucenica Irina',
-     'oPrepodob. Jovan; prenos mostiju svetog Save',
-     'oPojava Casnog Krsta u Jerusalimu',
-     'mSveti apostol i jevandjelist Jovan Bogoslov',
-     'mPrenos mostiju svetog Nikole',
-     'oSimon Zilot; prepodobna Isidora',
-     'cSveti Cirilo i Metodije; Nikodim srpski',
-     'oSveti Epifanije i sveti German',
-     'oSveta mucenica Glikerija',
-     'oSveti mucenik Isidor',
-     'oPrepodobni Pahomije Veliki',
-     'oPrepodobni Teodor Osveceni',
-     'oSveti apostol Andronik i Julija',
-     'oSveti mucenik Teodor Ankirski',
-     'oSvestenomucenik Patrikije Pruski',
-     'oSveti mucenik Talalej; Stefan Piperski',
-     'cSveti car Konstantin i carica Jelena',
-     'oSveti Jovan Vladimir',
-     'oPrepodobni Mihailo Ispovednik',
-     'oPrepodobni Simeon Divnogorac',
-     'mTrece obretenje glave sv. Jovana Krstitelja',
-     'oSveti apostol Karp',
-     'oSvestenomucenik Terapont',
-     'oPrepodobni Nikita Ispovednik',
-     'oPrepodobnomucenica Teodosija Tirska',
-     'oPrepodobni Isakije Dalmatski',
-     'oSveti apostol Jerma i sveti mucenik Ermije'),
+    ('mМАЈ- Свети пророк Јеремија',
+     'oСвети Атанасије Велики',
+     'oСвети мученици Тимотеј и Мавра',
+     'oСвета мученица Пелагија Тарсијска',
+     'oСвета великомученица Ирина',
+     'oПреподоб. Јован; пренос моштију светог Саве',
+     'oПојава Часног Крста у Јерусалиму',
+     'mСвети апостол и јеванђелист Јован Богослов',
+     'mПренос моштију светог Николе',
+     'oСимон Зилот; преподобна Исидора',
+     'cСвети Цирило и Методије; Никодим српски',
+     'oСвети Епифаније и свети Герман',
+     'oСвета мученица Гликерија',
+     'oСвети мученик Исидор',
+     'oПреподобни Пахомије Велики',
+     'oПреподобни Теодор Освећени',
+     'oСвети апостол Андроник и Јулија',
+     'oСвети мученик Теодор Анкирски',
+     'oСвештеномученик Патрикије Пруски',
+     'oСвети мученик Талалеј; Стефан Пиперски',
+     'cСвети цар Константин и царица Јелена',
+     'oСвети Јован Владимир',
+     'oПреподобни Михаило Исповедник',
+     'oПреподобни Симеон Дивногорац',
+     'mТреће обретење главе св. Јована Крститеља',
+     'oСвети апостол Карп',
+     'oСвештеномученик Терапонт',
+     'oПреподобни Никита Исповедник',
+     'oПреподобномученица Теодосија Тирска',
+     'oПреподобни Исакије Далматски',
+     'oСвети апостол Јерма и свети мученик Ермије'),
 
-    ('oJUN- Mucenik Justin Filozof',
-     'oSveti Nikifor; svestenomuc. Erazmo Ohridski',
-     'oSveti mucenik Lukijan i drugi',
-     'oSveti Mitrofan i sv. miron. Marta i Marija',
-     'oSvestenomucenik Dorotej; prep.Petar Koriski',
-     'oPrepodobni Visarion i Ilarion Novi',
-     'oSvestmuc. Teodot Ankirski',
-     'oSveti velikomucenik Teodor Stratilat',
-     'oSveti Kirilo Aleksandrijski',
-     'oSvestenomucenik Timotej Pruski',
-     'mSveti apostoli Vartolomej i Varnava',
-     'oPrepodobni Onufrije Veliki',
-     'oSveta mucenica Akilina i sveti Trifilije',
-     'mSveti prorok Jelisej; sveti Metodije',
-     'cSv. vmuc. car Lazar i srp.sv.muc.- Vidovdan',
-     'oSveti Tihon Amatunski Cudotvorac',
-     'oSveti mucenici Manuil, Savel i Ismail',
-     'oSveti mucenici Leontije, Ipatije i Teodul',
-     'oSveti ap. Juda i prepodobni Pajsije Veliki',
-     'oSvestenomucen. Metodije; prep.Naum Ohridski',
-     'oSveti mucenik Julijan Tarsijski',
-     'oSvestenomuc.Jevsevije; prep.Anastasija Srp.',
-     'oSveta mucenica Agripina; Vlad. ikona M. B.',
-     'cRozdestvo sv. Jovana Krstitelja - Ivanjdan',
-     'oPrepodobnomucenica Fevronija',
-     'oPrepodobni David Solunski',
-     'oPrepodobni Sampson Stranoprimac',
-     'oPrenos mostiju sv.besrebenika Kira i Jovana',
-     'cSveti apostoli Petar i Pavle - Petrovdan',
-     'oSabor svetih 12 apostola',''),
+    ('oЈУН- Мученик Јустин Филозоф',
+     'oСвети Никифор; свештеномуч. Еразмо Охридски',
+     'oСвети мученик Лукијан и други',
+     'oСвети Митрофан и св. мирон. Марта и Марија',
+     'oСвештеномученик Доротеј; преп.Петар Кориски',
+     'oПреподобни Висарион и Иларион Нови',
+     'oСвештмуч. Теодот Анкирски',
+     'oСвети великомученик Теодор Стратилат',
+     'oСвети Кирило Александријски',
+     'oСвештеномученик Тимотеј Пруски',
+     'mСвети апостоли Вартоломеј и Варнава',
+     'oПреподобни Онуфрије Велики',
+     'oСвета мученица Акилина и свети Трифилије',
+     'mСвети пророк Јелисеј; свети Методије',
+     'cСв. вмуч. цар Лазар и срп.св.муч.- Видовдан',
+     'oСвети Тихон Аматунски Чудотворац',
+     'oСвети мученици Мануил, Савел и Исмаил',
+     'oСвети мученици Леонтије, Ипатије и Теодул',
+     'oСвети ап. Јуда и преподобни Пајсије Велики',
+     'oСвештеномучен. Методије; преп.Наум Охридски',
+     'oСвети мученик Јулијан Тарсијски',
+     'oСвештеномуч.Јевсевије; преп.Анастасија Срп.',
+     'oСвета мученица Агрипина; Влад. икона М. Б.',
+     'cРождество св. Јована Крститеља - Ивањдан',
+     'oПреподобномученица Февронија',
+     'oПреподобни Давид Солунски',
+     'oПреподобни Сампсон Странопримац',
+     'oПренос моштију св.бесребеника Кира и Јована',
+     'cСвети апостоли Петар и Павле - Петровдан',
+     'oСабор светих 12 апостола',''),
 
-    ('mJUL- Sv. muc. i besrebrenici Kozma i Damjan',
-     'oPolaganje rize Presvete Bogorodice',
-     'oSveti mucenik Jakint i prepodobni Anatolije',
-     'oSveti Andrej Kritski i prepodobna Marta',
-     'oPrep. Atanasije Aton; Sergije Radonjeski',
-     'oPrepodobni Sisoje Veliki',
-     'oPrepodobni Toma Malein i sv. muc. Nedenja',
-     'mSveti velikomucenik Prokopije',
-     'oSvestenomucenik Pankratije i sveti Teodor',
-     'oSvetih 45 mucenika i Nikopolja',
-     'oSv. velikomucenica Efimija i Blazena Olga',
-     'oSveti mucenici Proklo i Ilarije',
-     'mSabor svetog arhangela Gavrila',
-     'oSveti apostol Akila i prepodobni Nikodim',
-     'mSveti mucenik Kirik i Julita; sv. Vladimir',
-     'oSvestenomuc. Atinogen; sv. mucenica Julija',
-     'mSveta velikomuc. Marina (Ognjena Marija)',
-     'oSveti mucenik Emilijan i mucenik Jakint',
-     'oSveti Stefan i prepod. Evgenija (Lazarevic)',
-     'cSveti prorok Ilija; sveti Ilija Gruzijski',
-     'oSveti prorok Jezekilj',
-     'oSveta Marija Magdalina (Blaga Marija)',
-     'oSveti mucenici Trofim, Teofil i drugi',
-     'oSveta mucenica Hristina',
-     'oUspenije svete Ane',
-     'mPrepmuc.Paraskeva (Trnova);Sv.Sava III srp.',
-     'mSveti velmuc. Pantelejmon; sv. Kliment Ohr.',
-     'oSv.ap. i djakon Prohor,Nikanor,Parmen i dr.',
-     'oSveti mucenik Kalinik i mucenica Serafima',
-     'oPrepodobna mati Angelina srpska',
-     'oSveti Evdokim'),
+    ('mЈУЛ- Св. муч. и бесребреници Козма и Дамјан',
+     'oПолагање ризе Пресвете Богородице',
+     'oСвети мученик Јакинт и преподобни Анатолије',
+     'oСвети Андреј Критски и преподобна Марта',
+     'oПреп. Атанасије Атон; Сергије Радоњешки',
+     'oПреподобни Сисоје Велики',
+     'oПреподобни Тома Малеин и св. муч. Недења',
+     'mСвети великомученик Прокопије',
+     'oСвештеномученик Панкратије и свети Теодор',
+     'oСветих 45 мученика и Никопоља',
+     'oСв. великомученица Ефимија и Блажена Олга',
+     'oСвети мученици Прокло и Иларије',
+     'mСабор светог архангела Гаврила',
+     'oСвети апостол Акила и преподобни Никодим',
+     'mСвети мученик Кирик и Јулита; св. Владимир',
+     'oСвештеномуч. Атиноген; св. мученица Јулија',
+     'mСвета великомуч. Марина (Огњена Марија)',
+     'oСвети мученик Емилијан и мученик Јакинт',
+     'oСвети Стефан и препод. Евгенија (Лазаревић)',
+     'cСвети пророк Илија; свети Илија Грузијски',
+     'oСвети пророк Језекиљ',
+     'oСвета Марија Магдалина (Блага Марија)',
+     'oСвети мученици Трофим, Теофил и други',
+     'oСвета мученица Христина',
+     'oУспеније свете Ане',
+     'mПрепмуч.Параскева (Трнова);Св.Сава III срп.',
+     'mСвети велмуч. Пантелејмон; св. Климент Охр.',
+     'oСв.ап. и ђакон Прохор,Никанор,Пармен и др.',
+     'oСвети мученик Калиник и мученица Серафима',
+     'oПреподобна мати Ангелина српска',
+     'oСвети Евдоким'),
 
-    ('mAVGUST- Iznosenje Casnog Krsta; Makaveji',
-     'oPrenos most. sv.prvomuc. i arhidjak.Stefana',
-     'oPrepodobni Isakije, Dalmat i Faust',
-     'oSvetih sedam mucenika u Efesu',
-     'oSveti muc. Evsignije (Pretpr. Preobrazenja)',
-     'cPreobrazenje Gospodnje',
-     'oPrepodobnomucenik Dometije i prepodobni Or',
-     'oSv. Emilijan Isp.; prep. Zosim Tumanski',
-     'oSv. apostol Matija i sv. mucenik Antonije',
-     'oSveti mucenik i arhidjakon Lavrentije',
-     'oSveti mucenik i arhidjakon Evplo',
-     'oSveti mucenici Fotije, Anikita i drugi',
-     'oSveti mucenik Ipolit (Odanije Preobrazenja)',
-     'oSveti prorok Mihej (Pretpr. Uspenija)',
-     'cUspenije Presv. Bogorod.- Velika Gospojina',
-     'oSv.Jevstatije, prep.Roman, Rafailo Banat.',
-     'oSveti mucenici Miron i Patroklo',
-     'oSveti mucenik Flor; prepodobni Jovan Rilski',
-     'oSveti mucenik Andrej Stratilat',
-     'oSveti prorok Samuilo i svestmuc. Samuilo',
-     'oSv.ap.Tadej; sv.mucenica Vasa i njena deca',
-     'mSveti muc. Agatonik; svestmuc. Gorazd Ces.',
-     'oSvestenomucenik Irinej i mucenik Lup',
-     'oSvestenomucenik Evtihije; mucenica Sara',
-     'oPrenos most.sv.ap.Vartolomeja i sv.ap.Tit',
-     'mSveti mucenici Adrijan i Natalija',
-     'oPrepodobni Pimen Veliki',
-     'oPrepodobni Mojsej Murin i Sava Pskovski',
-     'cUsekovanje glave svetog Jovana Krstitelja',
-     'mSv. Aleksan. Nevski; Kiril,Nikon i Makarije',
-     'oPolaganje pojasa Presvete Bogorodice'),
+    ('mАВГУСТ- Изношење Часног Крста; Макавеји',
+     'oПренос мост. св.првомуч. и архиђак.Стефана',
+     'oПреподобни Исакије, Далмат и Фауст',
+     'oСветих седам мученика у Ефесу',
+     'oСвети муч. Евсигније (Претпр. Преображења)',
+     'cПреображење Господње',
+     'oПреподобномученик Дометије и преподобни Ор',
+     'oСв. Емилијан Исп.; преп. Зосим Тумански',
+     'oСв. апостол Матија и св. мученик Антоније',
+     'oСвети мученик и архиђакон Лаврентије',
+     'oСвети мученик и архиђакон Евпло',
+     'oСвети мученици Фотије, Аникита и други',
+     'oСвети мученик Иполит (Оданије Преображења)',
+     'oСвети пророк Михеј (Претпр. Успенија)',
+     'cУспеније Пресв. Богород.- Велика Госпојина',
+     'oСв.Јевстатије, преп.Роман, Рафаило Банат.',
+     'oСвети мученици Мирон и Патрокло',
+     'oСвети мученик Флор; преподобни Јован Рилски',
+     'oСвети мученик Андреј Стратилат',
+     'oСвети пророк Самуило и свештмуч. Самуило',
+     'oСв.ап.Тадеј; св.мученица Васа и њена деца',
+     'mСвети муч. Агатоник; свештмуч. Горазд Чеш.',
+     'oСвештеномученик Иринеј и мученик Луп',
+     'oСвештеномученик Евтихије; мученица Сара',
+     'oПренос мост.св.ап.Вартоломеја и св.ап.Тит',
+     'mСвети мученици Адријан и Наталија',
+     'oПреподобни Пимен Велики',
+     'oПреподобни Мојсеј Мурин и Сава Псковски',
+     'cУсековање главе светог Јована Крститеља',
+     'mСв. Алексан. Невски; Кирил,Никон и Макарије',
+     'oПолагање појаса Пресвете Богородице'),
 
-    ('mSEPT.- Prep. Simeon Stolpnik - Crkvena N.g.',
-     'oSveti mucenik Mamant; sveti Jovan Postnik',
-     'oSvesmuc.Antim;sv.Joanikije I patrijarh srp.',
-     'oSvestmuc. Vavila; prorok Mojsej Bogovilac',
-     'oSveti prorok Zaharija i prav. Jelisaveta',
-     'oCudo sv. arhan. Mihaila; sv. muc. Evdoksije',
-     'oSveti muc. Sozont (Pretpr. Rozd. Pr. Bog.)',
-     'cRozdestvo Presv.Bogorodice (Mala Gospojina)',
-     'mSveti pravedni Joakim i Ana',
-     'oMucenice Minodora, Mitrodora i Nimfodora',
-     'oPrepodobna Teodora; prep. Sergije i German',
-     'oSvestmuc. Avtonom (Od. Roz. Presv. Bog.)',
-     'oSvestmucenik Kornilije (Pretpr.Vozdvizenja)',
-     'cVozdvizenje Casnog Krsta - Krstovdan',
-     'oVelikomucenik Nikita; sv.Josif Temisvarski',
-     'oVelmuc. Jefimija; prep. Dorotej i Kiprijan',
-     'mMuc. Vera, Nada i Ljubav i mati im Sofija',
-     'oSv. Evmenije Gortinski; mucenica Arnadna',
-     'oSv. muc. Trofim, Savatije i Dorimedont',
-     'mSveti velikomucenik Jevstatije',
-     'oSveti apostol Kodrat (Odanije Vozdvizenja)',
-     'oSvestenomucenik Foka i prorok Jona',
-     'mZacece svetog Jovana Krstitelja',
-     'oPrvomuc. Tekla; pepr. Simon Vladislav i dr.',
-     'oPrepodobna Efrosinija i Sergije Radonjeski',
-     'mSveti apostol i jevandjelist Jovan Bogoslov',
-     'oSveti mucenik Kalistrat',
-     'oPrepod. Hariton Ispovednik; mucenik Marko',
-     'mPrep. Kirijak Otselnik - Miholjdan',
-     'oSvestenomucenik Grigorije i sveti Mihail',''),
+    ('mСЕПТ.- Преп. Симеон Столпник - Црквена Н.г.',
+     'oСвети мученик Мамант; свети Јован Постник',
+     'oСвесмуч.Антим;св.Јоаникије I патријарх срп.',
+     'oСвештмуч. Вавила; пророк Мојсеј Боговилац',
+     'oСвети пророк Захарија и прав. Јелисавета',
+     'oЧудо св. архан. Михаила; св. муч. Евдоксије',
+     'oСвети муч. Созонт (Претпр. Рожд. Пр. Бог.)',
+     'cРождество Пресв.Богородице (Мала Госпојина)',
+     'mСвети праведни Јоаким и Ана',
+     'oМученице Минодора, Митродора и Нимфодора',
+     'oПреподобна Теодора; преп. Сергије и Герман',
+     'oСвештмуч. Автоном (Од. Рож. Пресв. Бог.)',
+     'oСвештмученик Корнилије (Претпр.Воздвижења)',
+     'cВоздвижење Часног Крста - Крстовдан',
+     'oВеликомученик Никита; св.Јосиф Темишварски',
+     'oВелмуч. Јефимија; преп. Доротеј и Кипријан',
+     'mМуч. Вера, Нада и Љубав и мати им Софија',
+     'oСв. Евменије Гортински; мученица Арнадна',
+     'oСв. муч. Трофим, Саватије и Доримедонт',
+     'mСвети великомученик Јевстатије',
+     'oСвети апостол Кодрат (Оданије Воздвижења)',
+     'oСвештеномученик Фока и пророк Јона',
+     'mЗачеће светог Јована Крститеља',
+     'oПрвомуч. Текла; пепр. Симон Владислав и др.',
+     'oПреподобна Ефросинија и Сергије Радоњешки',
+     'mСвети апостол и јеванђелист Јован Богослов',
+     'oСвети мученик Калистрат',
+     'oПрепод. Харитон Исповедник; мученик Марко',
+     'mПреп. Киријак Отселник - Михољдан',
+     'oСвештеномученик Григорије и свети Михаил',''),
 
-    ('mOKTOBAR- Pokrov Presvete Bogorodice',
-     'oSvestenomucenik Kiprijan i prep. Andrej',
-     'oSvestenomucenik Dionisije Areopagit',
-     'oSveti Stefan i Jelena (Stiljanovic)',
-     'oSveti muc. Haritina; svestmuc. Dionisije',
-     'mSveti Toma - Tomindan',
-     'mSveti mucenici Sergije i Vakho - Srdjevdan',
-     'oPrepodobna Pelagija i prepodobna Taisa',
-     'oSveti ap.Jakov; sveti Stefan srpski (Slepi)',
-     'oSveti mucenici Evlampije i Evlampija',
-     'oSveti apostol Filip i sv. Teofan Nacertani',
-     'oSveti mucenici Tarah, Prov i Andronik',
-     'oSv. muc. Karp; novomucenica Zlata Maglenska',
-     'cPrepodobna mati Paraskeva - Sveta Petka',
-     'oSvestenomucenik Lukijan i prep. Jevtimije',
-     'oSveti mucenik Longin Sotnik',
-     'oSveti prorok Osija; prepmuc. Andrej Kritski',
-     'mSveti ap. i jevan. Luka; sv.Petar Cetinjski',
-     'oPror.Joil; prep. Prohor Pcinjski i Jov.Ril.',
-     'oVelikomucenik Artemije',
-     'oPrepodobni Ilarion; sv. Ilarion i Visarion',
-     'oSveti ravnoapostolni Averkije Jerapoljski',
-     'mSveti ap. Jakov, prvi episkop jerusalimski',
-     'oSveti velikomucenik Areta',
-     'oSveti mucenici Makrijan i Martirije',
-     'cSveti velikomucenik Dimitrije - Mitrovdan',
-     'oSveti mucenik Nestor',
-     'oSveti muc. Terentije; sveti Arsenije Sremac',
-     'mSveti Avramije Zatvornik',
-     'oSveti kralj Milutin, Teoktist i Jelena',
-     'oSv. apostoli Stahije, Amplije, Urvin i dr.'),
+    ('mОКТОБАР- Покров Пресвете Богородице',
+     'oСвештеномученик Кипријан и преп. Андреј',
+     'oСвештеномученик Дионисије Ареопагит',
+     'oСвети Стефан и Јелена (Стиљановић)',
+     'oСвети муч. Харитина; свештмуч. Дионисије',
+     'mСвети Тома - Томиндан',
+     'mСвети мученици Сергије и Вакхо - Срђевдан',
+     'oПреподобна Пелагија и преподобна Таиса',
+     'oСвети ап.Јаков; свети Стефан српски (Слепи)',
+     'oСвети мученици Евлампије и Евлампија',
+     'oСвети апостол Филип и св. Теофан Нацертани',
+     'oСвети мученици Тарах, Пров и Андроник',
+     'oСв. муч. Карп; новомученица Злата Магленска',
+     'cПреподобна мати Параскева - Света Петка',
+     'oСвештеномученик Лукијан и преп. Јевтимије',
+     'oСвети мученик Лонгин Сотник',
+     'oСвети пророк Осија; препмуч. Андреј Критски',
+     'mСвети ап. и јеван. Лука; св.Петар Цетињски',
+     'oПрор.Јоил; преп. Прохор Пчињски и Јов.Рил.',
+     'oВеликомученик Артемије',
+     'oПреподобни Иларион; св. Иларион и Висарион',
+     'oСвети равноапостолни Аверкије Јерапољски',
+     'mСвети ап. Јаков, први епископ јерусалимски',
+     'oСвети великомученик Арета',
+     'oСвети мученици Макријан и Мартирије',
+     'cСвети великомученик Димитрије - Митровдан',
+     'oСвети мученик Нестор',
+     'oСвети муч. Терентије; свети Арсеније Сремац',
+     'mСвети Аврамије Затворник',
+     'oСвети краљ Милутин, Теоктист и Јелена',
+     'oСв. апостоли Стахије, Амплије, Урвин и др.'),
 
-    ('mNOVEMBAR- Sveti Kozma i Damjan - Vracevi',
-     'oSveti mucenici Akindin, Pigasije i dr.',
-     'mObnovljenje hrama sv. Georgija - Djurdjic',
-     'oPrep. Joanikije Veliki; svestmuc. Nikandar',
-     'oPrepodobnomucenici Galaktion i Epistima',
-     'oSveti Pavle Ispovednik',
-     'oSvetih 33 mucenika u Melitini; prep. Lazar',
-     'cSabor svetog arhan. Mihaila - Arandjelovdan',
-     'oSv. muc. Onisifor i Porfirije; Nektar. Eg.',
-     'oSveti apostoli Olimp, Erast, Rodion i dr.',
-     'oSveti kralj Stefan Decanski - Mratindan',
-     'mSveti Jovan Milostivi; prep. Nil Sinajski',
-     'mSveti Jovan Zlatousti',
-     'mSveti apostol Filip',
-     'oSveti mucenik Gurije',
-     'mSveti apostol i jevandjelist Matej',
-     'oSveti Grigorije Cudotvorac; Nikon Radonjski',
-     'oSveti mucenici Platon, Roman i drugi',
-     'oProrok Avdija; prepodobni Varlaam i Joasaf',
-     'oPrep. Grigorije Dekapolit (Pretpr. Vaved.)',
-     'cVavedenje Presvete Bogorodice',
-     'oSveti apostoli Filimon, Apfija i Arhip',
-     'oSveti Amfilohije i sveti Grigorije',
-     'mVelikomucenica Ekatarina; Merkurije',
-     'mSvestenomucenik Kliment (Odan. Vavedenja)',
-     'mSveti Alimpije Stolpnik',
-     'oSveti mucenik Jakov Persijanac',
-     'oPrepodobnomucenik Stefan; sveti muc. Hristo',
-     'oSveti mucenici Paramon, Filumen i drugi',
-     'mSveti apostol Andrej Prvozvani',''),
+    ('mНОВЕМБАР- Свети Козма и Дамјан - Врачеви',
+     'oСвети мученици Акиндин, Пигасије и др.',
+     'mОбновљење храма св. Георгија - Ђурђиц',
+     'oПреп. Јоаникије Велики; свештмуч. Никандар',
+     'oПреподобномученици Галактион и Епистима',
+     'oСвети Павле Исповедник',
+     'oСветих 33 мученика у Мелитини; преп. Лазар',
+     'cСабор светог архан. Михаила - Аранђеловдан',
+     'oСв. муч. Онисифор и Порфирије; Нектар. Ег.',
+     'oСвети апостоли Олимп, Ераст, Родион и др.',
+     'oСвети краљ Стефан Дечански - Мратиндан',
+     'mСвети Јован Милостиви; преп. Нил Синајски',
+     'mСвети Јован Златоусти',
+     'mСвети апостол Филип',
+     'oСвети мученик Гурије',
+     'mСвети апостол и јеванђелист Матеј',
+     'oСвети Григорије Чудотворац; Никон Радоњски',
+     'oСвети мученици Платон, Роман и други',
+     'oПророк Авдија; преподобни Варлаам и Јоасаф',
+     'oПреп. Григорије Декаполит (Претпр. Вавед.)',
+     'cВаведење Пресвете Богородице',
+     'oСвети апостоли Филимон, Апфија и Архип',
+     'oСвети Амфилохије и свети Григорије',
+     'mВеликомученица Екатарина; Меркурије',
+     'mСвештеномученик Климент (Одан. Ваведења)',
+     'mСвети Алимпије Столпник',
+     'oСвети мученик Јаков Персијанац',
+     'oПреподобномученик Стефан; свети муч. Христо',
+     'oСвети мученици Парамон, Филумен и други',
+     'mСвети апостол Андреј Првозвани',''),
 
-    ('oDECEMBAR- Prorok Naum i sveti Filaret',
-     'oSveti car Uros i prep. Joanikije Devicki',
-     'oProrok Sofonija i prepodobni Jovan Cutljivi',
-     'mVelikomucenica Varvara; prep.Jovan Damaskin',
-     'mPrep.Sava Osveceni; Nektarije Bitoljski',
-     'cSveti Nikola - Nikoljdan',
-     'oSveti Amvrosije; prepodob. Grigorije Gornj.',
-     'oPrep. Patapije; sv.ap. Sosten, Apolos i dr.',
-     'oZacece svete Ane',
-     'oSveta mucenica Mina; sveti Jovan Srpski',
-     'oPrepodobni Danilo Stolpnik',
-     'mPrepodobni Spiridon Cudotvorac',
-     'oMucenik Evstratije; sv. Gavrilo i Nikodim',
-     'oSveti muc. Tirs, Levkije, Filimon i dr.',
-     'oSvestenomucenik Elevterije i prep. Pavle',
-     'oProrok Agej i sveta Teofanija',
-     'oProrok Danilo; prepmucenik djakon Avakum',
-     'oSveti mucenik Sevastijan;sveti Modert i dr.',
-     'mSveti mucenik Bonifacije',
-     'mSv.Ignjatije Bog.; Dan.II Srp. (Pret.Rozd.)',
-     'oSveta mucenica Julijana i sv.Petar Kijevski',
-     'oSveta velikomucenica Anastasija',
-     'oSv. 10 mucenika Kritskih; prep. Naum Ohr.',
-     'oPrepodobnomucenica Evgenija - Badnji dan',
-     'cRozdestvo Hristovo - Bozic',
-     'cSabor Presvete Bogorodice',
-     'cSveti prvomucenik i arhidjakon Stefan',
-     'oSvetih 20.000 mucenika Nikomidijskih',
-     'oSvetih 14.000 mladenaca Vitlejemskih',
-     'oSveta mucenica Anisija i prepodobna Teodora',
-     'oPrepodobna Melanija (Odanije Rozdestva)'));
+    ('oДЕЦЕМБАР- Пророк Наум и свети Филарет',
+     'oСвети цар Урош и преп. Јоаникије Девички',
+     'oПророк Софонија и преподобни Јован Ћутљиви',
+     'mВеликомученица Варвара; преп.Јован Дамаскин',
+     'mПреп.Сава Освећени; Нектарије Битољски',
+     'cСвети Никола - Никољдан',
+     'oСвети Амвросије; преподоб. Григорије Горњ.',
+     'oПреп. Патапије; св.ап. Состен, Аполос и др.',
+     'oЗачеће свете Ане',
+     'oСвета мученица Мина; свети Јован Српски',
+     'oПреподобни Данило Столпник',
+     'mПреподобни Спиридон Чудотворац',
+     'oМученик Евстратије; св. Гаврило и Никодим',
+     'oСвети муч. Тирс, Левкије, Филимон и др.',
+     'oСвештеномученик Елевтерије и преп. Павле',
+     'oПророк Агеј и света Теофанија',
+     'oПророк Данило; препмученик ђакон Авакум',
+     'oСвети мученик Севастијан;свети Модерт и др.',
+     'mСвети мученик Бонифације',
+     'mСв.Игњатије Бог.; Дан.II Срп. (Прет.Рожд.)',
+     'oСвета мученица Јулијана и св.Петар Кијевски',
+     'oСвета великомученица Анастасија',
+     'oСв. 10 мученика Критских; преп. Наум Охр.',
+     'oПреподобномученица Евгенија - Бадњи дан',
+     'cРождество Христово - Божић',
+     'cСабор Пресвете Богородице',
+     'cСвети првомученик и архиђакон Стефан',
+     'oСветих 20.000 мученика Никомидијских',
+     'oСветих 14.000 младенаца Витлејемских',
+     'oСвета мученица Анисија и преподобна Теодора',
+     'oПреподобна Меланија (Оданије Рождества)'));
 
   praz_p: array[1..12] of prstr = (
-    'cUlazak G. I. Hrista u Jerusalim - Cveti',
-    'mVeliki cetvrtak (Veliko bdenije)',
-    'cVeliki petak',
-    'mVelika subota',
-    'cVaskrsenje Gospoda Isusa Hrista - Vaskrs',
-    'cVaskrsni ponedeljak',
-    'cVaskrsni utorak',
-    'cVaznesenje Gospodnje - Spasovdan',
-    'cSilazak Svetog Duha - Pedesetnica - Trojice',
-    'cDuhovski ponedeljak',
-    'cDuhovski utorak',
-    'cVaskrsenje Hristovo - Vaskrs - Blagovesti');
+    'cУлазак Г. И. Христа у Јерусалим - Цвети',
+    'mВелики четвртак (Велико бденије)',
+    'cВелики петак',
+    'mВелика субота',
+    'cВаскрсење Господа Исуса Христа - Васкрс',
+    'cВаскрсни понедељак',
+    'cВаскрсни уторак',
+    'cВазнесење Господње - Спасовдан',
+    'cСилазак Светог Духа - Педесетница - Тројице',
+    'cДуховски понедељак',
+    'cДуховски уторак',
+    'cВаскрсење Христово - Васкрс - Благовести');
 
 var
   _d, _m, _g, _dd, _k, __dj__, __mj__, __gj__,
@@ -500,7 +502,7 @@ var
   _post   : array[1..12] of array[1..31] of boolean;
   ned     : array[1..80] of array[1..2] of integer;
   imi     : array[1..80] of integer;
-  da      : string[4];
+  da      : string[12];
   quit, again : boolean;
   gnd, dnd, zatvtab, pktab : tbstr;
   mw      : word;
@@ -517,14 +519,14 @@ procedure dodvredmoom;
 var gu, gi_: byte;
 begin
   mmmax := jmmax;
-  mainm[1] := 'Desk';      mainm[2] := 'Opcije';
-  mainm[3] := 'Traganje';  mainm[4] := 'Stampanje';
-  mainm[5] := 'Pomoc';
-  mainh[1] := 'Desk informacije';
-  mainh[2] := 'Glavne komande (promena datuma, tabela postova, izlazak)';
-  mainh[3] := 'Pretrazivanja u kalendaru (nalazenja imena praznika, nedelja, itd.)';
-  mainh[4] := 'Izvoz mesecnog kalendara ili tabele postova u TXT';
-  mainh[5] := 'Pomoc i uputstvo za koriscenje Pravoslavnog kalendara';
+  mainm[1] := 'Деск';      mainm[2] := 'Опције';
+  mainm[3] := 'Трагање';   mainm[4] := 'Штампање';
+  mainm[5] := 'Помоћ';
+  mainh[1] := 'Деск информације';
+  mainh[2] := 'Главне команде (промена датума, табела постова, излазак)';
+  mainh[3] := 'Претраживања у календару (налажење имена празника, недеља, итд.)';
+  mainh[4] := 'Извоз месечног календара или табеле постова у TXT';
+  mainh[5] := 'Помоћ и упутство за коришћење Православног календара';
   for gu := 1 to mmmax do
   begin
     mmpos[gu] := mmpos_[gu];
@@ -534,28 +536,28 @@ begin
     mmnli[gu] := mmnli_[gu];
     mmcrt[gu] := mmcrt_[gu];
   end;
-  mmsss[1][1] := 'Program...';
-  mmsss[2][1] := 'Aktivni datum      F3';
-  mmsss[2][2] := 'Postovi        Ctrl-P';
-  mmsss[2][3] := 'Heortologija       F5';
-  mmsss[2][4] := 'Indiktion';
-  mmsss[2][5] := 'Izlazak        Ctrl-C';
-  mmsss[3][1] := 'Trazenje datuma';
-  mmsss[3][2] := 'Trazenje praznika';
-  mmsss[3][3] := 'Trazenje posta';
-  mmsss[3][4] := 'Trazenje nedelje';
-  mmsss[4][1] := 'Izvoz meseca u TXT    F7';
-  mmsss[4][2] := 'Izvoz postova u TXT  F8';
-  mmsss[4][3] := 'Konfiguracija';
-  mmsss[4][4] := 'Snimanje kofiguracije';
-  mmsss[5][1] := 'Pomoc          F1';
-  mmsss[5][2] := 'Sadrzaj    Alt-F1';
+  mmsss[1][1] := 'Програм...';
+  mmsss[2][1] := 'Активни датум      F3';
+  mmsss[2][2] := 'Постови        Ctrl-P';
+  mmsss[2][3] := 'Хеортологија       F5';
+  mmsss[2][4] := 'Индиктион';
+  mmsss[2][5] := 'Излазак        Ctrl-C';
+  mmsss[3][1] := 'Тражење датума';
+  mmsss[3][2] := 'Тражење празника';
+  mmsss[3][3] := 'Тражење поста';
+  mmsss[3][4] := 'Тражење недеље';
+  mmsss[4][1] := 'Извоз месеца у TXT    F7';
+  mmsss[4][2] := 'Извоз постова у TXT  F8';
+  mmsss[4][3] := 'Конфигурација';
+  mmsss[4][4] := 'Снимање конфигурације';
+  mmsss[5][1] := 'Помоћ          F1';
+  mmsss[5][2] := 'Садржај    Alt-F1';
   for gu := 1 to mmmax do mmpcm[gu] := 1;
-  kfun[1].sta[1] := 'F1';  kfun[1].sta[2] := 'Pomoc';           kfun[1].kps := 2;
-  kfun[2].sta[1] := 'F3';  kfun[2].sta[2] := 'Promena datuma';  kfun[2].kps := 12;
-  kfun[3].sta[1] := 'F5';  kfun[3].sta[2] := 'Heortologija';    kfun[3].kps := 31;
-  kfun[4].sta[1] := 'F7';  kfun[4].sta[2] := 'Stampanje meseca';kfun[4].kps := 48;
-  kfun[5].sta[1] := 'F10'; kfun[5].sta[2] := 'Meni';            kfun[5].kps := 69;
+  kfun[1].sta[1] := 'F1';  kfun[1].sta[2] := 'Помоћ';           kfun[1].kps := 2;
+  kfun[2].sta[1] := 'F3';  kfun[2].sta[2] := 'Промена датума';  kfun[2].kps := 12;
+  kfun[3].sta[1] := 'F5';  kfun[3].sta[2] := 'Хеортологија';    kfun[3].kps := 31;
+  kfun[4].sta[1] := 'F7';  kfun[4].sta[2] := 'Штампање месеца'; kfun[4].kps := 48;
+  kfun[5].sta[1] := 'F10'; kfun[5].sta[2] := 'Мени';            kfun[5].kps := 69;
 end;
 
 { ------------------------------------------------------------------ }
@@ -570,10 +572,13 @@ begin
   DecodeDate(dt, yr, mo, dy);
   _g := integer(yr);
   _m := integer(mo);
-  gnd     := '+' + niz(3,'-') + '+' + niz(4,'-') + '+' + niz(5,'-') + '+' + niz(45,'-') + '+';
-  dnd     := '+' + niz(3,'-') + '+' + niz(4,'-') + '+' + niz(5,'-') + '+' + niz(45,'-') + '+';
-  zatvtab := '+' + niz(3,'-') + '+' + niz(4,'-') + '+' + niz(5,'-') + '+' + niz(45,'-') + '+';
-  pktab   := '+' + niz(3,'-') + '+' + niz(4,'-') + '+' + niz(5,'-') + '+' + niz(45,'-') + '+';
+  { Table separators (single-line box glyphs). Column widths: D=3 G=4 J=5 feast=45.
+    gnd/dnd/pktab cross the column lines (├─┼─┼─┼─┤); zatvtab closes the table
+    bottom (└─┴─┴─┴─┘). }
+  gnd     := BOX_LTEE + nizs(3,BOX_H) + BOX_CROSS + nizs(4,BOX_H) + BOX_CROSS + nizs(5,BOX_H) + BOX_CROSS + nizs(45,BOX_H) + BOX_RTEE;
+  dnd     := gnd;
+  pktab   := gnd;
+  zatvtab := BOX_LLC + nizs(3,BOX_H) + BOX_BTEE + nizs(4,BOX_H) + BOX_BTEE + nizs(5,BOX_H) + BOX_BTEE + nizs(45,BOX_H) + BOX_LRC;
   dodvredmoom;
 end;
 
@@ -683,7 +688,7 @@ end;
 procedure stick(gd: byte);
 begin
   elwritecol(2, gd,
-    '|   |    |     |' + niz(45, ' ') + '|',
+    BOX_V + '   ' + BOX_V + '    ' + BOX_V + '     ' + BOX_V + niz(45, ' ') + BOX_V,
     co[2]);
 end;
 
@@ -691,11 +696,11 @@ procedure tekdat;
 begin
   openwind(67, 16, 79, 24, 27, 27, '', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
-  elwrite(69, 17, imm[_m] + niz(10 - length(imm[_m]), ' '));
+  elwrite(69, 17, imm[_m] + niz(10 - dlen(imm[_m]), ' '));
   elwrite(69, 19, prsl(_g));
   elwrite(69, 20, strf(_g) + '   ');
   elwrite(69, 22, strf(indiktiong(_g)) + '.');
-  elwrite(69, 23, 'indiktion');
+  elwrite(69, 23, 'индиктион');
 end;
 
 procedure lazarev_krst(_x, _y: integer);
@@ -709,9 +714,9 @@ procedure drawfirstscreen;
 begin
   { Flood-fill calendar area first, then draw chrome on top }
   elbojwind(1, 2, 65, 24, co[2]);
-  elwritecol(2, 2, '+' + niz(60, '-') + '+', co[2]);
-  elwritecol(2, 4, '+' + niz(3,'-') + '+' + niz(4,'-') + '+' + niz(5,'-') + '+' + niz(45,'-') + '+', co[2]);
-  elwritecol(2, 5, '| D |  G |  J  | Pravoslavni praznik' + niz(25, ' ') + '|', co[4]);
+  elwritecol(2, 2, BOX_ULC + nizs(60, BOX_H) + BOX_URC, co[2]);
+  elwritecol(2, 4, BOX_LTEE + nizs(3,BOX_H) + BOX_TTEE + nizs(4,BOX_H) + BOX_TTEE + nizs(5,BOX_H) + BOX_TTEE + nizs(45,BOX_H) + BOX_RTEE, co[2]);
+  elwritecol(2, 5, BOX_V + ' Д ' + BOX_V + '  Г ' + BOX_V + '  Ј  ' + BOX_V + ' Православни празник' + niz(25, ' ') + BOX_V, co[4]);
   openwind(67, 2, 79, 5, co[27], co[27], '', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
   elwrite(69, 3, 'NEA');
@@ -723,7 +728,7 @@ end;
 
 procedure drawscreen;
 begin
-  elwrite(2, 3, '|' + niz(60, ' ') + '|');
+  elwrite(2, 3, BOX_V + niz(60, ' ') + BOX_V);
   elwrite(2, 6, pktab);
   elwrite(2, 24, zatvtab);
   tekdat;
@@ -778,7 +783,7 @@ begin
     'o': tatt := co[17];
   end;
   elwritecol(19, qw, copy(pr__, 2, length(pr__) - 1), tatt);
-  NormVideo;
+  scrNorm;
 end;
 
 { ------------------------------------------------------------------ }
@@ -792,9 +797,9 @@ begin
     if (ned[fv][1] = dn) and (ned[fv][2] = ms) then
     begin
       if imi[fv] > 1000 then
-        im := 'Nedelja ' + strf(imi[fv] - 1000) + '. po Duhovima';
+        im := 'Недеља ' + strf(imi[fv] - 1000) + '. по Духовима';
       if (imi[fv] >= 100) and (imi[fv] <= 999) then
-        im := 'Nedelja ' + strf(imi[fv] - 100) + '. po Duhovima';
+        im := 'Недеља ' + strf(imi[fv] - 100) + '. по Духовима';
       if imi[fv] <= 19 then
         im := nedelja[imi[fv]];
     end;
@@ -804,9 +809,9 @@ end;
 procedure writenedelja(dn, ms, gd: integer);
 var im: pathstr;
 begin
-  elwritecol(2, gd, '|' + niz(60, ' ') + '|', co[2]);
+  elwritecol(2, gd, BOX_V + niz(60, ' ') + BOX_V, co[2]);
   im := imened(dn, ms);
-  elwritecol(32 - (length(im) div 2), gd, im, co[15]);
+  elwritecol(32 - (dlen(im) div 2), gd, im, co[15]);
 end;
 
 procedure kalendar;
@@ -818,10 +823,10 @@ begin
   qw  := 6; i := 0;
   di := __dj__; mi := __mj__; gi := __gj__;
   _dj2_ := __dj__; _mj2_ := __mj__; _gj2_ := __gj__;
-  if brmdg(_m, _g) mod 10 <> 1 then da := 'dana' else da := 'dan';
+  if brmdg(_m, _g) mod 10 <> 1 then da := 'дана' else da := 'дан';
   elwritecol(4, 3, strf(_g), co[17]);
-  elwritecol(59 - length(da), 3, strf(brmdg(_m, _g)) + ' ' + da, co[17]);
-  elwritecol(32 - (length(imm[_m]) div 2), 3, upcasestr(imm[_m]), co[15]);
+  elwritecol(59 - dlen(da), 3, strf(brmdg(_m, _g)) + ' ' + da, co[17]);
+  elwritecol(32 - (dlen(imm[_m]) div 2), 3, upcasestr(imm[_m]), co[15]);
   { Compute base tab position from day-of-week of first of month }
   if _dd = 0 then
   begin
@@ -858,7 +863,7 @@ begin
     end;
   end;
   if tabs[mt___ + 16] in ['a', 'b'] then
-    elwritecol(2, 24, '+' + niz(60, '-') + '+', co[2]);
+    elwritecol(2, 24, BOX_LLC + nizs(60, BOX_H) + BOX_LRC, co[2]);
   umanjul(_dj2_, _mj2_, _gj2_);
   i1_ := _topday; i2_ := vv;
 end;
@@ -1011,16 +1016,16 @@ begin
 
   for tg := 1 to 6 do addLine(krst1[tg]);
   addLine('');
-  addLine('+' + niz(60, '-') + '+');
-  buf := '| ' + strf(_g) + niz(4 - length(strf(_g)), ' ') +
-         niz(25 - (length(imm[_m]) div 2), ' ') +
+  addLine(BOX_ULC + nizs(60, BOX_H) + BOX_URC);
+  buf := BOX_V + ' ' + strf(_g) + niz(4 - length(strf(_g)), ' ') +
+         niz(25 - (dlen(imm[_m]) div 2), ' ') +
          upcasestr(imm[_m]) +
-         niz(21 - (length(imm[_m]) div 2), ' ');
-  if length(imm[_m]) mod 2 = 0 then buf := buf + ' ';
-  buf := buf + niz(4 - length(da), ' ') + strf(brmdg(_m, _g)) + ' ' + da + ' |';
+         niz(21 - (dlen(imm[_m]) div 2), ' ');
+  if dlen(imm[_m]) mod 2 = 0 then buf := buf + ' ';
+  buf := buf + niz(4 - dlen(da), ' ') + strf(brmdg(_m, _g)) + ' ' + da + ' ' + BOX_V;
   addLine(buf);
   addLine(dnd);
-  addLine('| D |  G |  J  | Pravoslavni praznik' + niz(25, ' ') + '|');
+  addLine(BOX_V + ' Д ' + BOX_V + '  Г ' + BOX_V + '  Ј  ' + BOX_V + ' Православни празник' + niz(25, ' ') + BOX_V);
   if mtt__ <> 2 then addLine(pktab) else addLine(gnd);
 
   drj := di; drm := mi; xcv := gi; d_d := _dd; qww := mtt__; dan := 0;
@@ -1030,8 +1035,8 @@ begin
       'a': addLine(gnd);
       'b': begin
              imnd := imened(drj, drm);
-             addLine('|' + niz((60 - length(imnd)) div 2, ' ') + imnd +
-                     niz(60 - length(imnd) - (60 - length(imnd)) div 2, ' ') + '|');
+             addLine(BOX_V + niz((60 - dlen(imnd)) div 2, ' ') + imnd +
+                     niz(60 - dlen(imnd) - (60 - dlen(imnd)) div 2, ' ') + BOX_V);
            end;
       'c': addLine(dnd);
     else
@@ -1040,12 +1045,12 @@ begin
         imnd := imepraz(drj, drm, xcv);
         { Column widths from separator +---+----+-----+---...---+:
             D=3  G=4  J+fast=5  feast=45 }
-        buf := '| ' + dun[d_d] + ' |' +
-               niz(3 - length(strf(dan)), ' ') + strf(dan) + ' |' +
+        buf := BOX_V + ' ' + dun[d_d] + ' ' + BOX_V +
+               niz(3 - length(strf(dan)), ' ') + strf(dan) + ' ' + BOX_V +
                niz(3 - length(strf(drj)), ' ') + strf(drj) + ' ';
         if _post[drm][drj] then buf := buf + BOX_BULL else buf := buf + ' ';
-        buf := buf + '| ' + copy(imnd, 2, length(imnd) - 1) +
-               niz(45 - length(imnd), ' ') + '|';
+        buf := buf + BOX_V + ' ' + copy(imnd, 2, length(imnd) - 1) +
+               niz(45 - dlen(imnd), ' ') + BOX_V;
         addLine(buf);
         inc(d_d); if d_d = 7 then d_d := 0;
         uvecjul(drj, drm, xcv);
@@ -1057,17 +1062,17 @@ begin
 
   if writeTXTLines(fname, nl, lines) then
   begin
-    openwind(8, 10, 71, 15, co[27], co[27], ' Izvoz u TXT ', 0,
+    openwind(8, 10, 71, 15, co[27], co[27], ' Извоз у TXT ', 0,
              false, false, false, false, wsingle, 0, 0, true, false, 0);
-    elwritecol(10, 11, 'TXT snimljen:', co[4]);
+    elwritecol(10, 11, 'TXT снимљен:', co[4]);
     elwritecol(10, 12, fname, co[15]);
     waitKey('');
   end
   else
   begin
-    openwind(8, 10, 71, 15, co[27], co[27], ' Greska ', 0,
+    openwind(8, 10, 71, 15, co[27], co[27], ' Грешка ', 0,
              false, false, false, false, wsingle, 0, 0, true, false, 0);
-    elwritecol(10, 11, 'Greska pri snimanju TXT fajla!', co[6]);
+    elwritecol(10, 11, 'Грешка при снимању TXT фајла!', co[6]);
     elwritecol(10, 12, fname, co[17]);
     waitKey('');
   end;
@@ -1080,11 +1085,10 @@ var buf: string; k: char;
 begin
   buf := '';
   repeat
-    GotoXY(x, y);
-    TextColor(co[15] and $0F);
-    TextBackground((co[15] shr 4) and $07);
-    Write(buf + niz(maxlen - length(buf), ' '));
-    GotoXY(x + length(buf), y);
+    scrGoto(x, y);
+    scrAttr(co[15]);
+    scrPut(buf + niz(maxlen - dlen(buf), ' '));
+    scrGoto(x + dlen(buf), y);
     k := ReadKey;
     if k = #0 then k := ReadKey
     else case k of
@@ -1095,7 +1099,7 @@ begin
       if (length(buf) < maxlen) and (k >= ' ') then buf := buf + k;
     end;
   until false;
-  NormVideo;
+  scrNorm;
   readinput := buf;
 end;
 
@@ -1109,40 +1113,40 @@ begin
   traziDatum := false;
   nd := 1; nm := _m; ng := _g;
   openwind(X1, Y1, X2, Y2, co[27], co[27],
-           ' Trazenje datuma ', 0,
+           ' Тражење датума ', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
   ok := false;
   repeat
-    elwritecol(X1+2, Y1+2, 'Dan   (1-31): ', co[4]);
-    GotoXY(X1+16, Y1+2);
-    TextColor(co[15] and $0F); TextBackground((co[15] shr 4) and $07);
-    Str(nd, s); Write(s + '   ');
-    elwritecol(X1+2, Y1+3, 'Mesec (1-12): ', co[4]);
-    GotoXY(X1+16, Y1+3);
-    TextColor(co[15] and $0F); TextBackground((co[15] shr 4) and $07);
-    Str(nm, s); Write(s + '   ');
-    elwritecol(X1+2, Y1+4, 'Godina:       ', co[4]);
-    GotoXY(X1+16, Y1+4);
-    TextColor(co[15] and $0F); TextBackground((co[15] shr 4) and $07);
-    Str(ng, s); Write(s + '     ');
-    NormVideo;
+    elwritecol(X1+2, Y1+2, 'Дан   (1-31): ', co[4]);
+    scrGoto(X1+16, Y1+2);
+    scrAttr(co[15]);
+    Str(nd, s); scrPut(s + '   ');
+    elwritecol(X1+2, Y1+3, 'Месец (1-12): ', co[4]);
+    scrGoto(X1+16, Y1+3);
+    scrAttr(co[15]);
+    Str(nm, s); scrPut(s + '   ');
+    elwritecol(X1+2, Y1+4, 'Година:       ', co[4]);
+    scrGoto(X1+16, Y1+4);
+    scrAttr(co[15]);
+    Str(ng, s); scrPut(s + '     ');
+    scrNorm;
     if nd > brmdg(nm, ng) then nd := brmdg(nm, ng);
     setjulijan(nd, nm, ng, jd, jm, jy, true);
     feast   := imepraz(jd, jm, jy);
     nedname := imened(jd, jm);
     elwritecol(X1+2, Y1+6,
-      'Julij: ' + strf(jd) + '.' + strf(jm) + '.' + strf(jy) + '.     ', co[17]);
+      'Јулиј: ' + strf(jd) + '.' + strf(jm) + '.' + strf(jy) + '.     ', co[17]);
     elwritecol(X1+2, Y1+7, niz(52, ' '), co[17]);
-    elwritecol(X1+2, Y1+7, 'Praznik: ' + copy(feast, 2, length(feast)), co[15]);
+    elwritecol(X1+2, Y1+7, 'Празник: ' + copy(feast, 2, length(feast)), co[15]);
     if _post[jm][jd] then
-      elwritecol(X1+2, Y1+8, 'Post: DA              ', co[19])
+      elwritecol(X1+2, Y1+8, 'Пост: ДА              ', co[19])
     else
-      elwritecol(X1+2, Y1+8, 'Post: -               ', co[17]);
+      elwritecol(X1+2, Y1+8, 'Пост: -               ', co[17]);
     elwritecol(X1+2, Y1+9, niz(52, ' '), co[17]);
     if nedname <> '' then
       elwritecol(X1+2, Y1+9, nedname, co[16]);
-    elwritecol(X1+2, Y1+11, '</>  = dan,  PgUp/PgDn = mesec,  +/- = god.', co[17]);
-    elwritecol(X1+2, Y1+12, 'Enter = idi na mesec,   Esc = odustani', co[17]);
+    elwritecol(X1+2, Y1+11, '</>  = дан,  PgUp/PgDn = месец,  +/- = год.', co[17]);
+    elwritecol(X1+2, Y1+12, 'Enter = иди на месец,   Esc = одустани', co[17]);
     k := ReadKey;
     if k = #0 then k := ReadKey;
     case k of
@@ -1174,9 +1178,9 @@ var
   feast              : prstr;
 begin
   openwind(X1, Y1, X2, Y2, co[27], co[27],
-           ' Trazenje praznika ', 0,
+           ' Тражење празника ', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
-  elwritecol(X1+2, Y1+2, 'Unesi deo naziva praznika:', co[4]);
+  elwritecol(X1+2, Y1+2, 'Унеси део назива празника:', co[4]);
   query := readinput(X1+2, Y1+3, 40);
   if (query = '') or (query[1] = #27) then exit;
   rcount := 0;
@@ -1184,29 +1188,31 @@ begin
     for d := 1 to brdmj(m, _g) do
     begin
       feast := imepraz(d, m, _g);
-      if Pos(UpperCase(query), UpperCase(copy(feast, 2, length(feast)))) > 0 then
+      { upcasestr folds Serbian Cyrillic too; SysUtils.UpperCase only folds
+        ASCII, so a lowercase query would miss Cyrillic-cased feast names }
+      if Pos(upcasestr(query), upcasestr(copy(feast, 2, length(feast)))) > 0 then
         if rcount < 50 then
         begin
           inc(rcount);
           rdates[rcount] := strf(d) + '.' + strf(m) + '.';
           rnames[rcount] := copy(feast, 2, length(feast));
-          if length(rnames[rcount]) > 47 then
-            rnames[rcount] := copy(rnames[rcount], 1, 47);
+          { feast names fit the 65-wide result window; no byte-cut truncation
+            (would split a UTF-8 Cyrillic sequence and corrupt the glyph) }
         end;
     end;
   openwind(X1, Y1, X2, Y2, co[27], co[27],
-           ' Rezultati: ' + strf(rcount) + ' ', 0,
+           ' Резултати: ' + strf(rcount) + ' ', 0,
            false, false, false, false, wsingle, 0, 0, true, false, 0);
   if rcount = 0 then
   begin
-    elwritecol(X1+2, Y1+2, 'Nije pronadjen nijedan praznik.', co[17]);
-    waitKey(' Pritisnite bilo koji taster... ');
+    elwritecol(X1+2, Y1+2, 'Није пронађен ниједан празник.', co[17]);
+    waitKey(' Притисните било који тастер...');
     exit;
   end;
   pg    := 1;
   pgmax := (rcount + PERPAGE - 1) div PERPAGE;
   repeat
-    elwritecol(X1+2, Y1+1, 'Datum      Praznik' + niz(50, ' '), co[15]);
+    elwritecol(X1+2, Y1+1, 'Датум      Празник' + niz(50, ' '), co[15]);
     for i := Y1+2 to Y1+2+PERPAGE do
       elwritecol(X1+2, i, niz(65, ' '), co[2]);
     pgstart := (pg - 1) * PERPAGE + 1;
@@ -1219,8 +1225,8 @@ begin
     if pgmax > 1 then
     begin
       elwritecol(X1+2, Y1+2+PERPAGE,
-        'Str. ' + strf(pg) + '/' + strf(pgmax) +
-        '   PgUp/PgDn=strana   Esc=zatvori', co[17]);
+        'Стр. ' + strf(pg) + '/' + strf(pgmax) +
+        '   PgUp/PgDn=страна   Esc=затвори', co[17]);
       k := ReadKey;
       if k = #0 then k := ReadKey;
       case k of
@@ -1231,7 +1237,7 @@ begin
     end
     else
     begin
-      waitKey(' Pritisnite bilo koji taster... ');
+      waitKey(' Притисните било који тастер...');
       exit;
     end;
   until false;
@@ -1246,11 +1252,11 @@ begin
   nm := _m;
   repeat
     openwind(X1, Y1, X2, Y2, co[27], co[27],
-             ' Trazenje posta ', 0,
+             ' Тражење поста ', 0,
              false, false, false, false, wsingle, 0, 0, true, false, 0);
     elwritecol(X1+2, Y1+2,
-      'Mesec: ' + imm[nm] + niz(40, ' '), co[15]);
-    elwritecol(X1+2, Y1+3, niz(66, '-'), co[27]);
+      'Месец: ' + imm[nm] + niz(40, ' '), co[15]);
+    elwritecol(X1+2, Y1+3, nizs(66, BOX_H), co[27]);
     nrow  := Y1 + 4;
     found := false;
     for d := 1 to brdmj(nm, _g) do
@@ -1264,14 +1270,14 @@ begin
         if nrow > Y1 + 16 then break;
       end;
     if not found then
-      elwritecol(X1+2, Y1+4, 'Nema posnih dana u ovom mesecu.', co[17])
+      elwritecol(X1+2, Y1+4, 'Нема посних дана у овом месецу.', co[17])
     else
       while nrow <= Y1+16 do
       begin
         elwritecol(X1+2, nrow, niz(67, ' '), co[2]);
         inc(nrow);
       end;
-    elwritecol(X1+2, Y1+17, 'PgUp/PgDn = mesec,  Esc = zatvori', co[17]);
+    elwritecol(X1+2, Y1+17, 'PgUp/PgDn = месец,  Esc = затвори', co[17]);
     k := ReadKey;
     if k = #0 then k := ReadKey;
     case k of
@@ -1290,14 +1296,14 @@ var total, pg, pgmax, pgstart, i: integer; k: char;
     nedname: pathstr; s: string[12];
 begin
   total := brned - 1;
-  if total < 1 then begin waitKey(' Nema podataka. '); exit; end;
+  if total < 1 then begin waitKey(' Нема података. '); exit; end;
   pg    := 1;
   pgmax := (total + PERPAGE - 1) div PERPAGE;
   repeat
     openwind(X1, Y1, X2, Y2, co[27], co[27],
-             ' Nedelje ' + strf(_g) + ' (' + strf(total) + ') ', 0,
+             ' Недеље ' + strf(_g) + ' (' + strf(total) + ') ', 0,
              false, false, false, false, wsingle, 0, 0, true, false, 0);
-    elwritecol(X1+2, Y1+1, 'Datum (jul.)   Naziv nedelje' + niz(40, ' '), co[15]);
+    elwritecol(X1+2, Y1+1, 'Датум (јул.)   Назив недеље' + niz(40, ' '), co[15]);
     for i := Y1+2 to Y1+2+PERPAGE do
       elwritecol(X1+2, i, niz(65, ' '), co[2]);
     pgstart := (pg - 1) * PERPAGE + 1;
@@ -1313,8 +1319,8 @@ begin
     if pgmax > 1 then
     begin
       elwritecol(X1+2, Y1+2+PERPAGE,
-        'Str. ' + strf(pg) + '/' + strf(pgmax) +
-        '   PgUp/PgDn=strana   Esc=zatvori', co[17]);
+        'Стр. ' + strf(pg) + '/' + strf(pgmax) +
+        '   PgUp/PgDn=страна   Esc=затвори', co[17]);
       k := ReadKey;
       if k = #0 then k := ReadKey;
       case k of
@@ -1325,7 +1331,7 @@ begin
     end
     else
     begin
-      waitKey(' Pritisnite bilo koji taster... ');
+      waitKey(' Притисните било који тастер...');
       exit;
     end;
   until false;
@@ -1430,9 +1436,8 @@ end;
 procedure pocetak;
 var t: byte;
 begin
-  TextBackground(1);
-  TextColor(7);
-  ClrScr;
+  scrAttrFB(7, 1);
+  scrCls;
   for t := 1 to 24 do
     elwritecol(1, t, niz(79, ' '), co[1]);
   { Row 25: write 79 chars to avoid wrap+scroll on the last terminal row }
@@ -1445,11 +1450,9 @@ var ge: integer;
     yj: tbstr;
     t : byte;
 begin
-  TextBackground(0);
-  TextColor(2);
-  ClrScr;
+  scrAttrFB(2, 0);
+  scrCls;
   lazarev_krst(3, 2);
-  GotoXY(20, 1);
   {$I-}
   Assign(f, direct + '_GRESKE.MOL');
   Reset(f);
@@ -1459,19 +1462,18 @@ begin
     for ge := 1 to 19 do
     begin
       ReadLn(f, yj);
-      GotoXY(20, ge + 1);
-      Write(yj);
+      scrGoto(20, ge + 1);
+      scrPut(yj);
     end;
     Close(f);
   end;
-  GotoXY(20, 22);
-  TextColor(14);
-  Write('NEA BYZANTIA');
-  TextColor(2);
-  WriteLn;
+  scrGoto(20, 22);
+  scrAttrFB(14, 0);
+  scrPut('NEA BYZANTIA');
+  scrAttrFB(2, 0);
   showcursor;
-  GotoXY(1, 25);
-  NormVideo;
+  scrGoto(1, 25);
+  scrNorm;
 end;
 
 { ================================================================== }

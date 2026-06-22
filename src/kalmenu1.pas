@@ -3,7 +3,8 @@ unit kalmenu1;
 {
   Menu bar, drop-down menus, and function-key strip.
   Replaces the original DOS kalmenu1 unit.
-  Uses FPC crt for all screen output.
+  Screen output goes through nizz's raw ANSI layer (UTF-8 safe);
+  crt is used only for keyboard input (ReadKey).
 }
 
 interface
@@ -53,7 +54,7 @@ var
 
   { kfun: function-key label strip, each entry has 2 labels and a column pos }
   kfun  : array[1..5] of record
-    sta : array[1..2] of string[20];
+    sta : array[1..2] of string[40];   { string[20] -> [40]: Cyrillic is 2 bytes/char }
     kps : byte;
   end;
 
@@ -77,8 +78,7 @@ implementation
 
 procedure setAttr(attr: byte);
 begin
-  TextColor(attr and $0F);
-  TextBackground((attr shr 4) and $07);
+  scrAttr(attr);
 end;
 
 { ── Menu bar (row 1) ────────────────────────────────────────────── }
@@ -86,16 +86,16 @@ end;
 procedure showmainmenu;
 var i: integer;
 begin
-  GotoXY(1, 1);
+  scrGoto(1, 1);
   setAttr(co[4]);
-  Write(niz(79, ' '));
+  scrPut(niz(79, ' '));
   for i := 1 to mmmax do
   begin
-    GotoXY(mmpos[i], 1);
+    scrGoto(mmpos[i], 1);
     setAttr(co[4]);
-    Write(' ' + mainm[i] + ' ');
+    scrPut(' ' + mainm[i] + ' ');
   end;
-  NormVideo;
+  scrNorm;
 end;
 
 { ── Function-key strip (row 25) ─────────────────────────────────── }
@@ -103,18 +103,18 @@ end;
 procedure showkeyfunc(n: byte);
 var i: integer;
 begin
-  GotoXY(1, 25);
+  scrGoto(1, 25);
   setAttr(co[1]);
-  Write(niz(79, ' '));
+  scrPut(niz(79, ' '));
   for i := 1 to n do
   begin
-    GotoXY(kfun[i].kps, 25);
+    scrGoto(kfun[i].kps, 25);
     setAttr(co[6]);
-    Write(kfun[i].sta[1]);
+    scrPut(kfun[i].sta[1]);
     setAttr(co[1]);
-    Write(' ' + kfun[i].sta[2]);
+    scrPut(' ' + kfun[i].sta[2]);
   end;
-  NormVideo;
+  scrNorm;
 end;
 
 { ── Drop-down rendering ─────────────────────────────────────────── }
@@ -128,25 +128,25 @@ begin
   y := 2;
   w := mmdim[mi][1];
   { top border }
-  GotoXY(x, y);
+  scrGoto(x, y);
   setAttr(co[27]);
-  Write(BOX_ULC + niz(w, BOX_H) + BOX_URC);
+  scrPut(BOX_ULC + nizs(w, BOX_H) + BOX_URC);
   { items }
   for j := 1 to mmnli[mi] do
   begin
-    GotoXY(x, y + j);
+    scrGoto(x, y + j);
     if j = selected then
       setAttr(co[15])
     else
       setAttr(co[27]);
-    Write(BOX_V + ' ' + mmsss[mi][j] +
-          niz(w - length(mmsss[mi][j]) - 1, ' ') + BOX_V);
+    scrPut(BOX_V + ' ' + mmsss[mi][j] +
+          niz(w - dlen(mmsss[mi][j]) - 1, ' ') + BOX_V);
   end;
   { bottom border }
-  GotoXY(x, y + mmnli[mi] + 1);
+  scrGoto(x, y + mmnli[mi] + 1);
   setAttr(co[27]);
-  Write(BOX_LLC + niz(w, BOX_H) + BOX_LRC);
-  NormVideo;
+  scrPut(BOX_LLC + nizs(w, BOX_H) + BOX_LRC);
+  scrNorm;
 end;
 
 procedure eraseDropDown(mi: byte);
@@ -156,11 +156,11 @@ begin
   x := mmpos[mi];
   for j := 2 to mmnli[mi] + 3 do
   begin
-    GotoXY(x, j);
+    scrGoto(x, j);
     setAttr(co[1]);
-    Write(niz(mmdim[mi][1] + 2, ' '));
+    scrPut(niz(mmdim[mi][1] + 2, ' '));
   end;
-  NormVideo;
+  scrNorm;
 end;
 
 { ── Menu navigation ─────────────────────────────────────────────── }
@@ -177,10 +177,10 @@ begin
   drawDropDown(curMenu, curItem);
   repeat
     { highlight active menu title }
-    GotoXY(mmpos[curMenu], 1);
+    scrGoto(mmpos[curMenu], 1);
     setAttr(co[15]);
-    Write(' ' + mainm[curMenu] + ' ');
-    NormVideo;
+    scrPut(' ' + mainm[curMenu] + ' ');
+    scrNorm;
     k := ReadKey;
     if k = #0 then k := ReadKey;  { extended key: consume prefix }
     case k of
@@ -189,9 +189,9 @@ begin
           if Assigned(onNavRedraw) then onNavRedraw
           else begin
             eraseDropDown(curMenu);
-            GotoXY(mmpos[curMenu], 1);
+            scrGoto(mmpos[curMenu], 1);
             setAttr(co[4]);
-            Write(' ' + mainm[curMenu] + ' ');
+            scrPut(' ' + mainm[curMenu] + ' ');
           end;
           if curMenu < mmmax then inc(curMenu) else curMenu := 1;
           curItem := 1;
@@ -202,9 +202,9 @@ begin
           if Assigned(onNavRedraw) then onNavRedraw
           else begin
             eraseDropDown(curMenu);
-            GotoXY(mmpos[curMenu], 1);
+            scrGoto(mmpos[curMenu], 1);
             setAttr(co[4]);
-            Write(' ' + mainm[curMenu] + ' ');
+            scrPut(' ' + mainm[curMenu] + ' ');
           end;
           if curMenu > 1 then dec(curMenu) else curMenu := mmmax;
           curItem := 1;
@@ -233,21 +233,21 @@ begin
           if Assigned(onNavRedraw) then onNavRedraw
           else begin
             eraseDropDown(curMenu);
-            GotoXY(mmpos[curMenu], 1);
+            scrGoto(mmpos[curMenu], 1);
             setAttr(co[4]);
-            Write(' ' + mainm[curMenu] + ' ');
+            scrPut(' ' + mainm[curMenu] + ' ');
           end;
-          NormVideo;
+          scrNorm;
           tastmenu := 0;
           exit;
         end;
     end;
   until done;
   eraseDropDown(curMenu);
-  GotoXY(mmpos[curMenu], 1);
+  scrGoto(mmpos[curMenu], 1);
   setAttr(co[4]);
-  Write(' ' + mainm[curMenu] + ' ');
-  NormVideo;
+  scrPut(' ' + mainm[curMenu] + ' ');
+  scrNorm;
   tastmenu := word(curMenu) shl 8 or word(curItem);
 end;
 
