@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## [1.0.1] — 2026-06-22
+
+### Fixed
+- Calendar drew phantom days past the end of the month (e.g. a 32nd day in
+  31-day August) when the scroll window extended beyond the last day. The
+  day-row loop now stops numbering at `brmdg(_m, _g)` and emits blank interior
+  rows for the remainder of the viewport.
+
+### Added
+- Standalone Windows build: a self-contained `windows-exe` workflow produces a
+  real `pravkal-<tag>-windows-x86_64.exe` and attaches it to the release
+  (generates `fpc.cfg` so the Chocolatey FPC resolves RTL units).
+
 ## [1.0.0] — 2026-06-21
 
 ### Added
